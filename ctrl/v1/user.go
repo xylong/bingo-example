@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"bingo-example/domain/model/user"
+	"bingo-example/domain/entity/user"
 	"github.com/xylong/bingo"
 	"go.mongodb.org/mongo-driver/mongo"
 )

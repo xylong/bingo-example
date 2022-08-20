@@ -2,13 +2,13 @@ package main
 
 import (
 	v1 "bingo-example/ctrl/v1"
-	"bingo-example/lib"
+	"bingo-example/lib/configuration"
 	"github.com/xylong/bingo"
 )
 
 func main() {
 	bingo.Init().
-		Inject(lib.NewDB()).
+		Inject(configuration.NewBoot()).
 		Mount("v1", v1.Controller...)().
 		Lunch()
 }
