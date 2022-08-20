@@ -8,6 +8,7 @@ mysql:
   user: root
   password: 123456
   db: test
+  charset: utf8mb4
 
 redis:
   host: 127.0.0.1
