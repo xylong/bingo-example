@@ -8,7 +8,7 @@ import (
 
 func main() {
 	bingo.Init().
-		Inject(configuration.NewBoot()).
+		Inject(configuration.NewBoot(), configuration.NewService()).
 		Mount("v1", v1.Controller...)().
 		Lunch()
 }

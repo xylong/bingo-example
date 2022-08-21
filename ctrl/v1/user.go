@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"bingo-example/application/server"
 	"bingo-example/domain/entity/user"
 	"github.com/xylong/bingo"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -11,6 +12,7 @@ func init() {
 }
 
 type UserCtrl struct {
+	service       *server.UserService `inject:"-"`
 	*mongo.Client `inject:"-"`
 }
 
@@ -24,6 +26,7 @@ func (c *UserCtrl) Name() string {
 
 func (c *UserCtrl) Route(group *bingo.Group) {
 	group.GET("index", c.index)
+	group.POST("users", c.add)
 }
 
 func (c *UserCtrl) index(ctx *bingo.Context) interface{} {
@@ -38,4 +41,8 @@ func (c *UserCtrl) index(ctx *bingo.Context) interface{} {
 	} else {
 		return one.InsertedID
 	}
+}
+
+func (c *UserCtrl) add(ctx *bingo.Context) string {
+	return c.service.Index()
 }
