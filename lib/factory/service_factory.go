@@ -2,7 +2,7 @@ package factory
 
 import (
 	"bingo-example/application/assembler"
-	"bingo-example/application/server"
+	"bingo-example/application/service"
 )
 
 const (
@@ -16,7 +16,7 @@ type ServiceFactory struct{}
 func (*ServiceFactory) Create(p Type) interface{} {
 	switch p {
 	case User:
-		return &server.UserService{Req: &assembler.UserReq{}, Rep: &assembler.UserRep{}}
+		return &service.UserService{Req: &assembler.UserReq{}, Rep: &assembler.UserRep{}}
 	default:
 		return nil
 	}

@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"bingo-example/application/server"
+	"bingo-example/application/service"
 	"bingo-example/domain/entity/user"
 	"github.com/xylong/bingo"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,7 +12,7 @@ func init() {
 }
 
 type UserCtrl struct {
-	service       *server.UserService `inject:"-"`
+	service       *service.UserService `inject:"-"`
 	*mongo.Client `inject:"-"`
 }
 

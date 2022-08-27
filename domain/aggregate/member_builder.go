@@ -14,8 +14,19 @@ type MemberBuilder struct {
 	logs    []*entity.LoginLog
 }
 
+func (m *MemberBuilder) SetLogs(logs []*entity.LoginLog) *MemberBuilder {
+	if logs != nil {
+		m.logs = logs
+	}
+
+	return m
+}
+
 func (m *MemberBuilder) SetProfile(profile *profile.Profile) *MemberBuilder {
-	m.profile = profile
+	if profile != nil {
+		m.profile = profile
+	}
+
 	return m
 }
 

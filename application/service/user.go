@@ -1,4 +1,4 @@
-package server
+package service
 
 import (
 	"bingo-example/application/assembler"

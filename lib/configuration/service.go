@@ -1,7 +1,7 @@
 package configuration
 
 import (
-	"bingo-example/application/server"
+	"bingo-example/application/service"
 	"bingo-example/lib/factory"
 )
 
@@ -14,6 +14,6 @@ func NewService() *Service {
 }
 
 // User 创建UserService
-func (s *Service) User() *server.UserService {
-	return new(factory.ServiceFactory).Create(factory.User).(*server.UserService)
+func (s *Service) User() *service.UserService {
+	return new(factory.ServiceFactory).Create(factory.User).(*service.UserService)
 }

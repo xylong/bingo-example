@@ -25,3 +25,7 @@ func (m *Member) Builder(u *user.User) *MemberBuilder {
 func (m *Member) Create() {
 
 }
+
+func (m *Member) GetMembers() {
+
+}
