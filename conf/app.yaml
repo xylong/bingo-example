@@ -2,6 +2,16 @@ server:
   port: 8080
   app_mode: debug
 
+log:
+  filename: logs/access.log
+  level: debug
+  max_size: 10
+  max_age: 30
+  max_backups: 30
+  compress: true
+  json: true
+  duration: 1440
+
 mysql:
   host: 127.0.0.1
   port: 3306

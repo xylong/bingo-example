@@ -1,12 +1,12 @@
 package factory
 
 import (
+	"bingo-example/lib"
 	"context"
 	"fmt"
-	"github.com/sirupsen/logrus"
-	"github.com/xylong/bingo"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -26,7 +26,7 @@ const (
 type AdapterType int
 
 // CreateAdapter 创建适配器
-type CreateAdapter func(*bingo.Config) interface{}
+type CreateAdapter func(configure lib.Configure) interface{}
 
 // CreateBoot 创建驱动
 func CreateBoot(adapterType AdapterType) CreateAdapter {
@@ -42,10 +42,11 @@ func CreateBoot(adapterType AdapterType) CreateAdapter {
 
 // NewGorm 创建gorm
 func NewGorm() CreateAdapter {
-	return func(config *bingo.Config) interface{} {
+	return func(configure lib.Configure) interface{} {
+		config := configure.Mysql()
+
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local",
-			config.Get("mysql.user"), config.GetString("mysql.password"), config.Get("mysql.host"),
-			config.Get("mysql.port"), config.Get("mysql.db"), config.Get("mysql.charset"))
+			config.User, config.Password, config.Host, config.Port, config.DB, config.Charset)
 
 		db, err := gorm.Open(mysql.New(mysql.Config{
 			DriverName:                "mysql",
@@ -80,23 +81,25 @@ func NewGorm() CreateAdapter {
 
 // NewMongo 创建mongo
 func NewMongo() CreateAdapter {
-	return func(config *bingo.Config) interface{} {
+	return func(configure lib.Configure) interface{} {
+		config := configure.Mongo()
+
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		defer cancel()
 
 		//mongodb://<dbuser>:<dbpassword>@ds041154.mongolab.com:41154/location
 		client, err := mongo.Connect(ctx, options.Client().ApplyURI(
 			fmt.Sprintf("mongodb://%s:%s@%s:%d",
-				config.Get("mongo.user"),
-				config.GetString("mongo.password"),
-				config.Get("mongo.host"),
-				config.Get("mongo.port"))))
+				config.User,
+				config.Password,
+				config.Host,
+				config.Port)))
 		if err != nil {
-			logrus.Error(err)
+			zap.L().Error("init mongo error", zap.Error(err))
 		}
 
 		if err = client.Ping(ctx, nil); err != nil {
-			logrus.Errorf("ping mongo error: %s", err.Error())
+			zap.L().Error("ping mongo error", zap.Error(err))
 		}
 
 		return client
