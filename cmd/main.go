@@ -1,7 +1,7 @@
 package main
 
 import (
-	v1 "bingo-example/ctrl/v1"
+	v1 "bingo-example/api/v1"
 	"bingo-example/lib/configuration"
 	"github.com/xylong/bingo"
 )

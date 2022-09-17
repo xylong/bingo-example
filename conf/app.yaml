@@ -33,6 +33,7 @@ mongo:
   password: 123456
   database: test
 
-custom:
-  user:
-    age: 18
+elastic:
+  host: 127.0.0.1
+  port: 9200
+  sniff: false

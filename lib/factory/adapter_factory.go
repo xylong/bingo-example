@@ -4,6 +4,7 @@ import (
 	"bingo-example/lib"
 	"context"
 	"fmt"
+	"github.com/olivere/elastic/v7"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
@@ -16,10 +17,10 @@ import (
 )
 
 const (
-	ElasticsearchAdapter = iota // es
-	GormAdapter                 // gorm
-	MongoAdapter                // mongo
-	RedisAdapter                // redis
+	GormAdapter  = iota // gorm
+	MongoAdapter        // mongo
+	RedisAdapter        // redis
+	Elastic             // elasticSearch
 )
 
 // AdapterType 适配类型
@@ -35,6 +36,8 @@ func CreateBoot(adapterType AdapterType) CreateAdapter {
 		return NewGorm()
 	case MongoAdapter:
 		return NewMongo()
+	case Elastic:
+		return NewEs()
 	default:
 		return nil
 	}
@@ -67,7 +70,7 @@ func NewGorm() CreateAdapter {
 		})
 
 		if err != nil {
-			panic(err)
+			zap.L().Fatal("init gorm error", zap.Error(err))
 		}
 
 		sqlDB, _ := db.DB()
@@ -95,11 +98,25 @@ func NewMongo() CreateAdapter {
 				config.Host,
 				config.Port)))
 		if err != nil {
-			zap.L().Error("init mongo error", zap.Error(err))
+			zap.L().Fatal("init mongo error", zap.Error(err))
 		}
 
 		if err = client.Ping(ctx, nil); err != nil {
 			zap.L().Error("ping mongo error", zap.Error(err))
+		}
+
+		return client
+	}
+}
+
+func NewEs() CreateAdapter {
+	return func(configure lib.Configure) interface{} {
+		config := configure.Elastic()
+		url := fmt.Sprintf("http://%s:%d", config.Host, config.Port)
+
+		client, err := elastic.NewClient(elastic.SetURL(url), elastic.SetSniff(config.Sniff))
+		if err != nil {
+			zap.L().Fatal("init elastic error", zap.Error(err))
 		}
 
 		return client
