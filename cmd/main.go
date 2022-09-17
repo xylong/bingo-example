@@ -2,13 +2,13 @@ package main
 
 import (
 	v1 "bingo-example/api/v1"
-	"bingo-example/lib/configuration"
+	"bingo-example/lib/core"
 	"github.com/xylong/bingo"
 )
 
 func main() {
 	bingo.Init("conf", "app").
-		Inject(configuration.NewBoot(), configuration.NewService()).
+		Inject(core.NewClient(), core.NewService()).
 		Mount("v1", v1.Controller...)().
 		Lunch()
 }

@@ -17,36 +17,39 @@ import (
 )
 
 const (
-	GormAdapter  = iota // gorm
-	MongoAdapter        // mongo
-	RedisAdapter        // redis
-	Elastic             // elasticSearch
+	GormClient    CreateType = iota // gorm
+	MongoClient                     // mongo
+	RedisClient                     // redis
+	ElasticClient                   // elasticSearch
 )
 
-// AdapterType 适配类型
-type AdapterType int
+// createClient 创建第三方客户端连接
+type createClient func(configure lib.Configure) interface{}
 
-// CreateAdapter 创建适配器
-type CreateAdapter func(configure lib.Configure) interface{}
+// ClientFactory 客户端工厂
+type ClientFactory struct{}
 
-// CreateBoot 创建驱动
-func CreateBoot(adapterType AdapterType) CreateAdapter {
-	switch adapterType {
-	case GormAdapter:
-		return NewGorm()
-	case MongoAdapter:
-		return NewMongo()
-	case Elastic:
-		return NewEs()
+// Create 创建连接客户端
+func (f *ClientFactory) Create(createType CreateType) interface{} {
+	lib.Init()
+	switch createType {
+	case GormClient:
+		return newGorm()(lib.Mysql)
+	case MongoClient:
+		return newMongo()(lib.Mongo)
+	case RedisClient:
+		return newRedis()(lib.Redis)
+	case ElasticClient:
+		return newElastic()(lib.Elastic)
 	default:
 		return nil
 	}
 }
 
-// NewGorm 创建gorm
-func NewGorm() CreateAdapter {
+// newGorm 创建gorm
+func newGorm() createClient {
 	return func(configure lib.Configure) interface{} {
-		config := configure.Mysql()
+		config, _ := configure.(*lib.MysqlConfig)
 
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local",
 			config.User, config.Password, config.Host, config.Port, config.DB, config.Charset)
@@ -82,11 +85,9 @@ func NewGorm() CreateAdapter {
 	}
 }
 
-// NewMongo 创建mongo
-func NewMongo() CreateAdapter {
+func newMongo() createClient {
 	return func(configure lib.Configure) interface{} {
-		config := configure.Mongo()
-
+		config, _ := configure.(*lib.MongoConfig)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		defer cancel()
 
@@ -109,9 +110,15 @@ func NewMongo() CreateAdapter {
 	}
 }
 
-func NewEs() CreateAdapter {
+func newRedis() createClient {
 	return func(configure lib.Configure) interface{} {
-		config := configure.Elastic()
+		return nil
+	}
+}
+
+func newElastic() createClient {
+	return func(configure lib.Configure) interface{} {
+		config, _ := configure.(*lib.ElasticConfig)
 		url := fmt.Sprintf("http://%s:%d", config.Host, config.Port)
 
 		client, err := elastic.NewClient(elastic.SetURL(url), elastic.SetSniff(config.Sniff))

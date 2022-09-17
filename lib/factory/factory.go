@@ -1,10 +1,9 @@
 package factory
 
-// Type 创建类型
-type Type int
+// CreateType 创建类型
+type CreateType uint8
 
-// Creator 创建者
-// 总工厂
+// Creator 总工厂
 type Creator interface {
-	Create(Type) interface{}
+	Create(CreateType) interface{}
 }

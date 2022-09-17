@@ -3,20 +3,45 @@ package lib
 import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+	"sync"
 )
 
-func init() {
-	Config = NewConfiguration()
-}
+var (
+	once sync.Once
 
-// Config 配置
-var Config *Configuration
+	Mysql   *MysqlConfig
+	Mongo   *MongoConfig
+	Redis   *RedisConfig
+	Elastic *ElasticConfig
+)
+
+func Init() {
+	once.Do(func() {
+		Mysql = new(MysqlConfig)
+		if err := Mysql.load(); err != nil {
+			zap.L().Fatal("load mysql config error", zap.Error(err))
+		}
+
+		Mongo = new(MongoConfig)
+		if err := Mongo.load(); err != nil {
+			zap.L().Fatal("load mongo config error", zap.Error(err))
+		}
+
+		Redis = new(RedisConfig)
+		if err := Redis.load(); err != nil {
+			zap.L().Fatal("load redis config error", zap.Error(err))
+		}
+
+		Elastic = new(ElasticConfig)
+		if err := Elastic.load(); err != nil {
+			zap.L().Fatal("load elastic config error", zap.Error(err))
+		}
+	})
+}
 
 // Configure 配置
 type Configure interface {
-	Mysql() *MysqlConfig
-	Mongo() *MongoConfig
-	Elastic() *ElasticConfig
+	load() error
 }
 
 // MysqlConfig mysql配置
@@ -29,6 +54,10 @@ type MysqlConfig struct {
 	Charset  string
 }
 
+func (c *MysqlConfig) load() error {
+	return viper.UnmarshalKey("mysql", c)
+}
+
 // MongoConfig mongo配置
 type MongoConfig struct {
 	Host     string
@@ -38,6 +67,21 @@ type MongoConfig struct {
 	Password string
 }
 
+func (c *MongoConfig) load() error {
+	return viper.UnmarshalKey("mongo", c)
+}
+
+// RedisConfig redis配置
+type RedisConfig struct {
+	Host     string
+	Port     int
+	Password string
+}
+
+func (c *RedisConfig) load() error {
+	return viper.UnmarshalKey("redis", c)
+}
+
 // ElasticConfig es配置
 type ElasticConfig struct {
 	Host  string
@@ -45,43 +89,6 @@ type ElasticConfig struct {
 	Sniff bool
 }
 
-// Configuration 配置
-type Configuration struct {
-	*MysqlConfig
-	*MongoConfig
-	*ElasticConfig
-}
-
-func NewConfiguration() *Configuration {
-	return &Configuration{new(MysqlConfig), new(MongoConfig), new(ElasticConfig)}
-}
-
-// Mysql 获取mysql配置
-func (c *Configuration) Mysql() *MysqlConfig {
-	if err := viper.UnmarshalKey("mysql", c.MysqlConfig); err != nil {
-		zap.L().Error("load mysql config error", zap.Error(err))
-		return nil
-	}
-
-	return c.MysqlConfig
-}
-
-// Mongo 获取mongo配置
-func (c *Configuration) Mongo() *MongoConfig {
-	if err := viper.UnmarshalKey("mongo", c.MongoConfig); err != nil {
-		zap.L().Error("load mongo config error", zap.Error(err))
-		return nil
-	}
-
-	return c.MongoConfig
-}
-
-// Elastic 获取elastic配置
-func (c *Configuration) Elastic() *ElasticConfig {
-	if err := viper.UnmarshalKey("elastic", c.ElasticConfig); err != nil {
-		zap.L().Error("load elastic config error", zap.Error(err))
-		return nil
-	}
-
-	return c.ElasticConfig
+func (c *ElasticConfig) load() error {
+	return viper.UnmarshalKey("elastic", c)
 }

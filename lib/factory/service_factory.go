@@ -6,15 +6,15 @@ import (
 )
 
 const (
-	User = iota // 用户
+	User CreateType = iota // 用户
 )
 
 // ServiceFactory 服务工厂
 type ServiceFactory struct{}
 
 // Create 创建service
-func (*ServiceFactory) Create(p Type) interface{} {
-	switch p {
+func (*ServiceFactory) Create(createType CreateType) interface{} {
+	switch createType {
 	case User:
 		return &service.UserService{Req: &assembler.UserReq{}, Rep: &assembler.UserRep{}}
 	default:
