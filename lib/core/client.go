@@ -1,6 +1,7 @@
 package core
 
 import (
+	"bingo-example/lib/config"
 	. "bingo-example/lib/factory"
 	"github.com/olivere/elastic/v7"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -11,6 +12,7 @@ import (
 type Client struct{}
 
 func NewClient() *Client {
+	config.LoadConfig()
 	return new(Client)
 }
 

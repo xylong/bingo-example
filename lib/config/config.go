@@ -1,4 +1,4 @@
-package lib
+package config
 
 import (
 	"github.com/spf13/viper"
@@ -15,7 +15,7 @@ var (
 	Elastic *ElasticConfig
 )
 
-func Init() {
+func LoadConfig() {
 	once.Do(func() {
 		Mysql = new(MysqlConfig)
 		if err := Mysql.load(); err != nil {

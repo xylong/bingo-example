@@ -1,7 +1,7 @@
 package factory
 
 import (
-	"bingo-example/lib"
+	"bingo-example/lib/config"
 	"context"
 	"fmt"
 	"github.com/olivere/elastic/v7"
@@ -24,35 +24,38 @@ const (
 )
 
 // createClient 创建第三方客户端连接
-type createClient func(configure lib.Configure) interface{}
+type createClient func(chan<- interface{})
 
 // ClientFactory 客户端工厂
 type ClientFactory struct{}
 
 // Create 创建连接客户端
 func (f *ClientFactory) Create(createType CreateType) interface{} {
-	lib.Init()
-	switch createType {
-	case GormClient:
-		return newGorm()(lib.Mysql)
-	case MongoClient:
-		return newMongo()(lib.Mongo)
-	case RedisClient:
-		return newRedis()(lib.Redis)
-	case ElasticClient:
-		return newElastic()(lib.Elastic)
-	default:
-		return nil
-	}
+	c := make(chan interface{})
+
+	go func() {
+		switch createType {
+		case GormClient:
+			newGorm()(c)
+		case MongoClient:
+			newMongo()(c)
+		case RedisClient:
+			newRedis()(c)
+		case ElasticClient:
+			newElastic()(c)
+		default:
+			c <- struct{}{}
+		}
+	}()
+
+	return <-c
 }
 
 // newGorm 创建gorm
 func newGorm() createClient {
-	return func(configure lib.Configure) interface{} {
-		config, _ := configure.(*lib.MysqlConfig)
-
+	return func(c chan<- interface{}) {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local",
-			config.User, config.Password, config.Host, config.Port, config.DB, config.Charset)
+			config.Mysql.User, config.Mysql.Password, config.Mysql.Host, config.Mysql.Port, config.Mysql.DB, config.Mysql.Charset)
 
 		db, err := gorm.Open(mysql.New(mysql.Config{
 			DriverName:                "mysql",
@@ -81,23 +84,19 @@ func newGorm() createClient {
 		sqlDB.SetMaxOpenConns(20)
 		sqlDB.SetConnMaxLifetime(time.Second * 10)
 
-		return db
+		c <- db
 	}
 }
 
 func newMongo() createClient {
-	return func(configure lib.Configure) interface{} {
-		config, _ := configure.(*lib.MongoConfig)
+	return func(c chan<- interface{}) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		defer cancel()
 
 		//mongodb://<dbuser>:<dbpassword>@ds041154.mongolab.com:41154/location
 		client, err := mongo.Connect(ctx, options.Client().ApplyURI(
 			fmt.Sprintf("mongodb://%s:%s@%s:%d",
-				config.User,
-				config.Password,
-				config.Host,
-				config.Port)))
+				config.Mongo.User, config.Mongo.Password, config.Mongo.Host, config.Mongo.Port)))
 		if err != nil {
 			zap.L().Fatal("init mongo error", zap.Error(err))
 		}
@@ -106,26 +105,25 @@ func newMongo() createClient {
 			zap.L().Error("ping mongo error", zap.Error(err))
 		}
 
-		return client
+		c <- client
 	}
 }
 
 func newRedis() createClient {
-	return func(configure lib.Configure) interface{} {
-		return nil
+	return func(c chan<- interface{}) {
+		c <- struct{}{}
 	}
 }
 
 func newElastic() createClient {
-	return func(configure lib.Configure) interface{} {
-		config, _ := configure.(*lib.ElasticConfig)
-		url := fmt.Sprintf("http://%s:%d", config.Host, config.Port)
+	return func(c chan<- interface{}) {
+		url := fmt.Sprintf("http://%s:%d", config.Elastic.Host, config.Elastic.Port)
 
-		client, err := elastic.NewClient(elastic.SetURL(url), elastic.SetSniff(config.Sniff))
+		client, err := elastic.NewClient(elastic.SetURL(url), elastic.SetSniff(config.Elastic.Sniff))
 		if err != nil {
 			zap.L().Fatal("init elastic error", zap.Error(err))
 		}
 
-		return client
+		c <- client
 	}
 }
