@@ -24,15 +24,10 @@ func (c *UserCtrl) Name() string {
 	return "UserCtrl"
 }
 
-func (c *UserCtrl) Route(group *bingo.Group) {
-	group.GET("index", c.index)
-	group.POST("users", c.add)
-}
-
 func (c *UserCtrl) index(ctx *bingo.Context) interface{} {
 	collection := c.Database("test").Collection("users")
 	if one, err := collection.InsertOne(ctx, &user.User{
-		Name:     "静静",
+		Nickname: "静静",
 		Phone:    "13811223344",
 		Birthday: "1990-10-01",
 		Gender:   0,
@@ -43,6 +38,6 @@ func (c *UserCtrl) index(ctx *bingo.Context) interface{} {
 	}
 }
 
-func (c *UserCtrl) add(ctx *bingo.Context) string {
-	return c.service.Index()
+func (c *UserCtrl) Route(group *bingo.Group) {
+	group.GET("index", c.index)
 }

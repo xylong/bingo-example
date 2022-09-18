@@ -6,16 +6,16 @@ import (
 	"sync"
 )
 
-var (
-	once sync.Once
+var once sync.Once
 
+var (
 	Mysql   *MysqlConfig
 	Mongo   *MongoConfig
 	Redis   *RedisConfig
 	Elastic *ElasticConfig
 )
 
-func LoadConfig() {
+func Init() {
 	once.Do(func() {
 		Mysql = new(MysqlConfig)
 		if err := Mysql.load(); err != nil {

@@ -1,6 +1,9 @@
 package profile
 
-import "time"
+import (
+	"golang.org/x/crypto/bcrypt"
+	"time"
+)
 
 // Profile 用户信息
 type Profile struct {
@@ -14,4 +17,9 @@ type Profile struct {
 	Signature string    `gorm:"type:varchar(255);comment=个性签名" json:"signature"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+// VerifyPassword 校验密码
+func (p *Profile) VerifyPassword(password string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(p.Password), []byte(password)) == nil
 }

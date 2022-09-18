@@ -12,7 +12,7 @@ import (
 type Client struct{}
 
 func NewClient() *Client {
-	config.LoadConfig()
+	config.Init()
 	return new(Client)
 }
 
