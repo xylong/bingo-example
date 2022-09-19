@@ -1,40 +1,32 @@
 package service
 
 import (
-	"bingo-example/application/assembler"
-	"bingo-example/application/dto"
 	"bingo-example/domain/entity"
-	"bingo-example/domain/entity/user"
-	"bingo-example/infrastructure/dao/g"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
-	"gorm.io/gorm"
 	"time"
 )
 
 type JwtService struct {
-	DB  *gorm.DB `inject:"-"`
-	Req *assembler.AuthReq
-	Rep *assembler.AuthRep
 }
 
-func (s *JwtService) Login(param *dto.LoginParam) string {
-	u := user.NewUser(user.WithPhone(param.Phone))
-	if err := g.NewUserRepo(s.DB).Get(u); err != nil {
-		return ""
-	}
-
-	if !u.Profile.VerifyPassword(param.Password) {
-		return ""
-	}
-
-	token, err := s.generateToken(u.ID)
-	if err != nil {
-		return ""
-	}
-
-	return token
-}
+//func (s *JwtService) Login(param *dto.LoginParam) string {
+//	u := user.NewUser(user.WithPhone(param.Phone))
+//	if err := g.NewUserRepo(s.DB).Get(u); err != nil {
+//		return ""
+//	}
+//
+//	if !u.Profile.VerifyPassword(param.Password) {
+//		return ""
+//	}
+//
+//	token, err := s.generateToken(u.ID)
+//	if err != nil {
+//		return ""
+//	}
+//
+//	return token
+//}
 
 // generateToken 生成token
 func (s *JwtService) generateToken(id int) (string, error) {

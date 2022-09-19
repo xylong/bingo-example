@@ -17,7 +17,7 @@ type ServiceFactory struct{}
 func (*ServiceFactory) Create(createType CreateType) interface{} {
 	switch createType {
 	case Jwt:
-		return &service.JwtService{Req: &assembler.AuthReq{}, Rep: &assembler.AuthRep{}}
+		return &service.JwtService{}
 	case User:
 		return &service.UserService{Req: &assembler.UserReq{}, Rep: &assembler.UserRep{}}
 	default:

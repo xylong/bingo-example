@@ -4,6 +4,9 @@ import (
 	"bingo-example/domain/entity"
 	"bingo-example/domain/entity/profile"
 	"bingo-example/domain/entity/user"
+	"bingo-example/domain/repository"
+	"bingo-example/infrastructure/dao/g"
+	"gorm.io/gorm"
 )
 
 // MemberBuilder 会员构建器
@@ -12,6 +15,9 @@ type MemberBuilder struct {
 	user    *user.User
 	profile *profile.Profile
 	logs    []*entity.LoginLog
+
+	userRepo    repository.UserRepo
+	profileRepo repository.ProfileRepo
 }
 
 func (m *MemberBuilder) SetLogs(logs []*entity.LoginLog) *MemberBuilder {
@@ -30,12 +36,30 @@ func (m *MemberBuilder) SetProfile(profile *profile.Profile) *MemberBuilder {
 	return m
 }
 
+func (m *MemberBuilder) SetUserRepo(db *gorm.DB) *MemberBuilder {
+	m.userRepo = g.NewUserDao(db)
+	return m
+}
+
+func (m *MemberBuilder) SetProfileRepo(db *gorm.DB) *MemberBuilder {
+	m.profileRepo = g.NewProfileDao(db)
+	return m
+}
+
 // Build 构建聚合实体
 func (m *MemberBuilder) Build() *Member {
 	member := &Member{User: m.user}
 
 	if m.profile != nil {
 		member.Profile = m.profile
+	}
+
+	if m.userRepo != nil {
+		member.UserRepo = m.userRepo
+	}
+
+	if m.profileRepo != nil {
+		member.ProfileRepo = m.profileRepo
 	}
 
 	return member

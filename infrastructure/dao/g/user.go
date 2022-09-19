@@ -5,16 +5,20 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepo struct {
+type UserDao struct {
 	db *gorm.DB
 }
 
-func NewUserRepo(db *gorm.DB) *UserRepo {
-	return &UserRepo{db: db}
+func NewUserDao(db *gorm.DB) *UserDao {
+	return &UserDao{db: db}
 }
 
-func (r *UserRepo) Get(user *user.User) error {
-	err := r.db.First(user).Error
+func (d *UserDao) Create(user *user.User) error {
+	return d.db.Create(user).Error
+}
+
+func (d *UserDao) Get(user *user.User) error {
+	err := d.db.First(user).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return err
 	}

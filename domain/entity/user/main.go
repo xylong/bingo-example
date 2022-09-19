@@ -9,11 +9,7 @@ import (
 
 // User 用户
 type User struct {
-	ID       int    `gorm:"primaryKey;autoIncrement;" xorm:"'id' int(11) pk autoincr notnull" json:"id"`
-	Nickname string `json:"name,omitempty"`
-	Phone    string `json:"phone,omitempty"`
-	Birthday string `json:"birthday,omitempty"`
-	Gender   uint8  `json:"gender,omitempty"`
+	ID int `gorm:"primaryKey;autoIncrement;" xorm:"'id' int(11) pk autoincr notnull" json:"id"`
 
 	*ThirdParty `gorm:"embedded"` // 第三方信息
 	*Info       `gorm:"embedded"` // 	基本信息
@@ -26,7 +22,7 @@ type User struct {
 	Profile *profile.Profile
 }
 
-func NewUser(attr ...entity.Attr) *User {
+func New(attr ...entity.Attr) *User {
 	user := &User{ThirdParty: NewThirdParty(), Info: NewInfo()}
 	entity.Attrs(attr).Apply(user)
 	return user
