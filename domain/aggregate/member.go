@@ -39,6 +39,10 @@ func (m *Member) Create() error {
 	return nil
 }
 
+func (m *Member) Get(with ...string) error {
+	return m.UserRepo.Get(m.User, with...)
+}
+
 func (m *Member) GetMembers() {
 
 }

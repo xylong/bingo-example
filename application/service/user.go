@@ -4,8 +4,6 @@ import (
 	"bingo-example/application/assembler"
 	"bingo-example/application/dto"
 	"bingo-example/domain/aggregate"
-	"bingo-example/domain/entity/profile"
-	"bingo-example/domain/entity/user"
 	"gorm.io/gorm"
 )
 
@@ -23,10 +21,6 @@ func (s *UserService) Index() string {
 	return "aa"
 }
 
-func (s *UserService) Create() {
-	new(aggregate.Member).Builder(&user.User{}).SetProfile(&profile.Profile{}).Build()
-}
-
 // Register 注册
 func (s *UserService) Register(param *dto.RegisterParam) (int, string, string) {
 	tx := s.DB.Begin()
@@ -38,6 +32,24 @@ func (s *UserService) Register(param *dto.RegisterParam) (int, string, string) {
 		return 1001, err.Error(), ""
 	} else {
 		tx.Commit()
+	}
+
+	token, err := s.Jwt.generateToken(member.User.ID)
+	if err != nil {
+		return 1001, err.Error(), ""
+	}
+
+	return 0, "", token
+}
+
+func (s *UserService) Login(param *dto.LoginParam) (int, string, string) {
+	member := new(aggregate.Member).Builder(s.Req.Login2User(param)).SetUserRepo(s.DB).Build()
+	if err := member.Get("Profile"); err != nil {
+		return 1002, err.Error(), ""
+	}
+
+	if !member.User.Profile.VerifyPassword(param.Password) {
+		return 1002, "账号或密码错误", ""
 	}
 
 	token, err := s.Jwt.generateToken(member.User.ID)

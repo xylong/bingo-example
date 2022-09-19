@@ -17,9 +17,15 @@ func (d *UserDao) Create(user *user.User) error {
 	return d.db.Create(user).Error
 }
 
-func (d *UserDao) Get(user *user.User) error {
-	err := d.db.First(user).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
+func (d *UserDao) Get(user *user.User, with ...string) error {
+	if len(with) > 0 {
+		for _, s := range with {
+			d.db = d.db.Preload(s)
+		}
+	}
+
+	err := d.db.Where(user).First(user).Error
+	if err != nil {
 		return err
 	}
 

@@ -43,7 +43,7 @@ func (p *Profile) BeforeCreate(db *gorm.DB) error {
 
 // VerifyPassword 校验密码
 func (p *Profile) VerifyPassword(password string) bool {
-	return bcrypt.CompareHashAndPassword([]byte(p.Password), []byte(password)) == nil
+	return bcrypt.CompareHashAndPassword([]byte(p.Password), []byte(util.Md5(password)+p.Salt)) == nil
 }
 
 func WithPassword(password string) entity.Attr {
