@@ -4,6 +4,7 @@ import (
 	"bingo-example/application/assembler"
 	"bingo-example/application/dto"
 	"bingo-example/domain/aggregate"
+	"bingo-example/domain/entity/user"
 	"gorm.io/gorm"
 )
 
@@ -58,4 +59,14 @@ func (s *UserService) Login(param *dto.LoginParam) (int, string, string) {
 	}
 
 	return 0, "", token
+}
+
+// Profile 个人信息
+func (s *UserService) Profile(id int) (int, string, *dto.Profile) {
+	u := user.New(user.WithID(id))
+	if err := new(aggregate.Member).Builder(u).SetUserRepo(s.DB).Build().Get("Profile"); err != nil {
+		return 1002, "not found", nil
+	}
+
+	return 0, "", s.Rep.User2Profile(u)
 }

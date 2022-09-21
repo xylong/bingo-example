@@ -2,18 +2,34 @@ package middleware
 
 import (
 	"bingo-example/application/service"
-	"fmt"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/xylong/bingo"
+	"go.uber.org/zap"
 	"net/http"
 	"strings"
 )
 
 // Authentication 鉴权
-type Authentication struct {
+type Authentication struct{}
+
+func NewAuthentication() *Authentication {
+	return &Authentication{}
 }
 
 func (a *Authentication) Before(ctx *bingo.Context) error {
+	var err error
+
+	defer func() {
+		if err != nil {
+			zap.L().Warn(err.Error(),
+				zap.String("path", ctx.Request.URL.Path),
+				zap.String("method", ctx.Request.Method),
+				zap.String("ip", ctx.ClientIP()))
+		}
+	}()
+
 	token := ctx.Token()
 	if token == "" {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
@@ -22,7 +38,8 @@ func (a *Authentication) Before(ctx *bingo.Context) error {
 			"data":    nil,
 		})
 
-		return fmt.Errorf("unauthorized")
+		err = errors.New("unauthorized")
+		return nil
 	}
 
 	parts := strings.SplitN(token, " ", 2)
@@ -33,7 +50,8 @@ func (a *Authentication) Before(ctx *bingo.Context) error {
 			"data":    nil,
 		})
 
-		return fmt.Errorf("unauthorized")
+		err = jwt.ErrTokenMalformed
+		return nil
 	}
 
 	claims, err := new(service.JwtService).ParseToken(parts[1])
@@ -43,7 +61,8 @@ func (a *Authentication) Before(ctx *bingo.Context) error {
 			"message": "access denied",
 			"data":    nil,
 		})
-		return fmt.Errorf("unauthorized")
+
+		return nil
 	}
 
 	ctx.Set("user_id", claims.ID)

@@ -2,6 +2,7 @@ package v1
 
 import (
 	"bingo-example/application/dto"
+	"bingo-example/application/middleware"
 	"bingo-example/application/service"
 	"github.com/xylong/bingo"
 )
@@ -35,7 +36,15 @@ func (c *UserCtrl) login(ctx *bingo.Context) (int, string, interface{}) {
 			Unwrap().(*dto.LoginParam))
 }
 
+func (c *UserCtrl) me(ctx *bingo.Context) (int, string, interface{}) {
+	return c.Service.Profile(ctx.GetInt("user_id"))
+}
+
 func (c *UserCtrl) Route(group *bingo.Group) {
 	group.POST("register", c.register)
 	group.POST("login", c.login)
+
+	group.Group("", func(group *bingo.Group) {
+		group.GET("me", c.me)
+	}, middleware.NewAuthentication())
 }

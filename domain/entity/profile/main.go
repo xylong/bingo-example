@@ -41,6 +41,14 @@ func (p *Profile) BeforeCreate(db *gorm.DB) error {
 	return nil
 }
 
+func (p *Profile) Birth() string {
+	if !p.Birthday.IsZero() {
+		return p.Birthday.Format("2006-01-02")
+	}
+
+	return ""
+}
+
 // VerifyPassword 校验密码
 func (p *Profile) VerifyPassword(password string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(p.Password), []byte(util.Md5(password)+p.Salt)) == nil
