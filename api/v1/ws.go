@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	RegisterCtrl(NewWsController())
+	registerCtrl(NewWsController())
 }
 
 type WsController struct{}

@@ -8,6 +8,7 @@ import (
 const (
 	Jwt CreateType = iota // 用户
 	User
+	Book
 )
 
 // ServiceFactory 服务工厂
@@ -20,6 +21,8 @@ func (*ServiceFactory) Create(createType CreateType) interface{} {
 		return &service.JwtService{}
 	case User:
 		return &service.UserService{Req: &assembler.UserReq{}, Rep: &assembler.UserRep{}}
+	case Book:
+		return &service.BookService{Req: &assembler.BookReq{}, Rep: &assembler.BookRep{}}
 	default:
 		return nil
 	}

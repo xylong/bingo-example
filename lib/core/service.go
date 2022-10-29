@@ -21,3 +21,8 @@ func (s *Service) User() *service.UserService {
 func (s *Service) Jwt() *service.JwtService {
 	return new(ServiceFactory).Create(Jwt).(*service.JwtService)
 }
+
+// Book 书
+func (s *Service) Book() *service.BookService {
+	return new(ServiceFactory).Create(Book).(*service.BookService)
+}

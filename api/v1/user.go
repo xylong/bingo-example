@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	RegisterCtrl(NewUserCtrl())
+	registerCtrl(NewUserCtrl())
 }
 
 type UserCtrl struct {
