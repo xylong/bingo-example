@@ -3,6 +3,7 @@ package service
 import (
 	"bingo-example/application/assembler"
 	"bingo-example/application/dto"
+	"bingo-example/application/service/common"
 	"bingo-example/domain/entity"
 	"context"
 	"fmt"
@@ -13,16 +14,19 @@ import (
 	"sync"
 )
 
+// es
 const (
-	bookIndex = "books" // elastic索引
+	bookIndex = "books"      // 📚es索引
+	bookPress = "book_press" // 出版社
 )
 
 type BookService struct {
 	Req *assembler.BookReq `inject:"-"`
 	Rep *assembler.BookRep `inject:"-"`
 
-	DB *gorm.DB        `inject:"-"`
-	Es *elastic.Client `inject:"-"`
+	DB *gorm.DB `inject:"-"`
+
+	*common.ElasticSearch `inject:"-"`
 }
 
 // BatchImport 批量导入
@@ -67,8 +71,8 @@ func (s *BookService) Search(query *dto.BookQuery) interface{} {
 	)
 
 	if query.Press != "" {
-		term := elastic.NewTermsQuery("book_press", s.Req.FilterPress(query.Press)...)
-		result, err = s.Es.Search().Query(term).Index(bookIndex).Do(context.Background())
+		term := elastic.NewTermsQuery(bookPress, s.Req.FilterPress(query.Press)...)
+		result, err = s.Es.Search().Index(bookIndex).Query(term).Do(context.Background())
 	} else {
 		result, err = s.Es.Search().Index(bookIndex).Do(context.Background())
 	}
@@ -79,4 +83,15 @@ func (s *BookService) Search(query *dto.BookQuery) interface{} {
 	}
 
 	return s.Rep.Result2Slice(result)
+}
+
+// GetPress 获取出版社
+func (s *BookService) GetPress() []interface{} {
+	collapse := elastic.NewCollapseBuilder(bookPress)
+	res, err := s.Es.Search().Index(bookIndex).Size(20).Collapse(collapse).FetchSource(false).Do(context.Background())
+	if err != nil {
+		zap.L().Error("get book press error", zap.Error(err))
+	}
+
+	return s.Rep.Fields2Slice(res, bookPress)
 }

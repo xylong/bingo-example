@@ -22,3 +22,18 @@ func (r *BookRep) Result2Slice(result *elastic.SearchResult) []*entity.Book {
 
 	return books
 }
+
+// Fields2Slice 将结果中指定字段转为slice
+func (r *BookRep) Fields2Slice(result *elastic.SearchResult, key string) []interface{} {
+	var res []interface{}
+
+	for _, hit := range result.Hits.Hits {
+		if v, ok := hit.Fields[key].([]interface{}); ok {
+			res = append(res, v[0])
+		} else {
+			break
+		}
+	}
+
+	return res
+}
