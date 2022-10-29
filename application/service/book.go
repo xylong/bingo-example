@@ -74,28 +74,31 @@ func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
 		err     error
 	)
 
-	if param.Name != "" {
-		matchQuery := elastic.NewMatchQuery(bookName, param.Name)
-		queries = append(queries, matchQuery)
-	}
-
-	if param.Press != "" {
-		termsQuery := elastic.NewTermsQuery(bookPress, s.Req.FilterPress(param.Press)...)
-		queries = append(queries, termsQuery)
-	}
-
-	if param.Lowest > 0 || param.Highest > 0 {
-		rangeQuery := elastic.NewRangeQuery(bookPrice1)
-
-		if param.Lowest > 0 {
-			rangeQuery.Gte(param.Lowest)
+	// 过滤
+	{
+		if param.Name != "" {
+			matchQuery := elastic.NewMatchQuery(bookName, param.Name)
+			queries = append(queries, matchQuery)
 		}
 
-		if param.Highest > 0 {
-			rangeQuery.Lte(param.Highest)
+		if param.Press != "" {
+			termsQuery := elastic.NewTermsQuery(bookPress, s.Req.FilterPress(param.Press)...)
+			queries = append(queries, termsQuery)
 		}
 
-		queries = append(queries, rangeQuery)
+		if param.Lowest > 0 || param.Highest > 0 {
+			rangeQuery := elastic.NewRangeQuery(bookPrice1)
+
+			if param.Lowest > 0 {
+				rangeQuery.Gte(param.Lowest)
+			}
+
+			if param.Highest > 0 {
+				rangeQuery.Lte(param.Highest)
+			}
+
+			queries = append(queries, rangeQuery)
+		}
 	}
 
 	// 排序
@@ -103,7 +106,6 @@ func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
 		if param.OrderSet.Score {
 			sort = append(sort, elastic.NewScoreSort().Desc())
 		}
-
 		if param.OrderSet.Price == entity.OrderByPriceAsc {
 			sort = append(sort, elastic.NewFieldSort(bookPrice1).Asc())
 		}
@@ -112,7 +114,9 @@ func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
 		}
 	}
 
-	result, err = s.Es.Search().Index(bookIndex).Query(s.Must(queries...)).SortBy(sort...).Do(context.Background())
+	result, err = s.Es.Search().Index(bookIndex).Query(s.Must(queries...)).
+		SortBy(sort...).From(param.Offset()).Size(param.PageSize).
+		Do(context.Background())
 	if err != nil {
 		zap.L().Error("search book error", zap.Error(err))
 		return nil
