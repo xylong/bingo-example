@@ -16,8 +16,10 @@ import (
 
 // es
 const (
-	bookIndex = "books"      // 📚es索引
-	bookPress = "book_press" // 出版社
+	bookIndex  = "books"       // 📚es索引
+	bookName   = "book_name"   // 书名
+	bookPress  = "book_press"  // 出版社
+	bookPrice1 = "book_price1" // 价格1
 )
 
 type BookService struct {
@@ -64,19 +66,53 @@ func (s *BookService) BatchImport() {
 }
 
 // Search 📚搜索
-func (s *BookService) Search(query *dto.BookQuery) interface{} {
+func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
 	var (
-		result *elastic.SearchResult
-		err    error
+		result  *elastic.SearchResult
+		sort    []elastic.Sorter
+		queries []elastic.Query
+		err     error
 	)
 
-	if query.Press != "" {
-		term := elastic.NewTermsQuery(bookPress, s.Req.FilterPress(query.Press)...)
-		result, err = s.Es.Search().Index(bookIndex).Query(term).Do(context.Background())
-	} else {
-		result, err = s.Es.Search().Index(bookIndex).Do(context.Background())
+	if param.Name != "" {
+		matchQuery := elastic.NewMatchQuery(bookName, param.Name)
+		queries = append(queries, matchQuery)
 	}
 
+	if param.Press != "" {
+		termsQuery := elastic.NewTermsQuery(bookPress, s.Req.FilterPress(param.Press)...)
+		queries = append(queries, termsQuery)
+	}
+
+	if param.Lowest > 0 || param.Highest > 0 {
+		rangeQuery := elastic.NewRangeQuery(bookPrice1)
+
+		if param.Lowest > 0 {
+			rangeQuery.Gte(param.Lowest)
+		}
+
+		if param.Highest > 0 {
+			rangeQuery.Lte(param.Highest)
+		}
+
+		queries = append(queries, rangeQuery)
+	}
+
+	// 排序
+	{
+		if param.OrderSet.Score {
+			sort = append(sort, elastic.NewScoreSort().Desc())
+		}
+
+		if param.OrderSet.Price == entity.OrderByPriceAsc {
+			sort = append(sort, elastic.NewFieldSort(bookPrice1).Asc())
+		}
+		if param.OrderSet.Price == entity.OrderByPriceDesc {
+			sort = append(sort, elastic.NewFieldSort(bookPrice1).Desc())
+		}
+	}
+
+	result, err = s.Es.Search().Index(bookIndex).Query(s.Must(queries...)).SortBy(sort...).Do(context.Background())
 	if err != nil {
 		zap.L().Error("search book error", zap.Error(err))
 		return nil

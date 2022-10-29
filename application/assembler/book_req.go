@@ -8,8 +8,8 @@ import (
 type BookReq struct{}
 
 // Filter 组合过滤条件
-func (r *BookReq) Filter(query *dto.BookQuery) {
-	if query.Press != "" {
+func (r *BookReq) Filter(param *dto.BookSearchParam) {
+	if param.Press != "" {
 
 	}
 }

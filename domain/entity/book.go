@@ -1,5 +1,10 @@
 package entity
 
+const (
+	OrderByPriceAsc  = iota + 1 // 价格从低到高
+	OrderByPriceDesc            // 价格从高到低
+)
+
 type Books []*Book
 
 type Book struct {

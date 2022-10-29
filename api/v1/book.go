@@ -24,8 +24,8 @@ func (c *BookController) import2es(ctx *bingo.Context) {
 
 func (c *BookController) search(ctx *bingo.Context) interface{} {
 	return c.Service.Search(
-		ctx.Binding(ctx.ShouldBind, &dto.BookQuery{}).
-			Unwrap().(*dto.BookQuery))
+		ctx.Binding(ctx.ShouldBind, &dto.BookSearchParam{}).
+			Unwrap().(*dto.BookSearchParam))
 }
 
 func (c *BookController) press(ctx *bingo.Context) interface{} {
