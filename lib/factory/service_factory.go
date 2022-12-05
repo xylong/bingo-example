@@ -11,6 +11,7 @@ const (
 	Es                    // elastic
 	User
 	Book
+	Question
 )
 
 // ServiceFactory 服务工厂
@@ -27,6 +28,8 @@ func (*ServiceFactory) Create(createType CreateType) interface{} {
 		return &service.UserService{Req: &assembler.UserReq{}, Rep: &assembler.UserRep{}}
 	case Book:
 		return &service.BookService{Req: &assembler.BookReq{}, Rep: &assembler.BookRep{}}
+	case Question:
+		return &service.QuestionService{Req: &assembler.QuestionReq{},Rep: assembler.QuestionRep{}}
 	default:
 		return nil
 	}

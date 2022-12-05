@@ -32,3 +32,8 @@ func (s *Service) User() *service.UserService {
 func (s *Service) Book() *service.BookService {
 	return new(ServiceFactory).Create(Book).(*service.BookService)
 }
+
+// Question 题库
+func (s *Service) Question() *service.QuestionService {
+	return new(ServiceFactory).Create(Question).(*service.QuestionService)
+}

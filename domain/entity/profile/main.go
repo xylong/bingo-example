@@ -12,7 +12,7 @@ import (
 // Profile 用户信息
 type Profile struct {
 	ID        int       `gorm:"primaryKey;autoIncrement;" json:"id"`
-	UserID    int       `gorm:"type:int(11);;not null;uniqueIndex;comment:用户🆔" json:"user_id"`
+	UserID    int       `gorm:"type:int(11);not null;uniqueIndex;comment:用户🆔" json:"user_id"`
 	Password  string    `gorm:"type:varchar(100);comment:密码" json:"password"`
 	Salt      string    `gorm:"type:char(6);comment:盐" json:"salt"`
 	Birthday  time.Time `gorm:"type:date;default:null;comment:出生日期" json:"birthday"`
