@@ -4,9 +4,8 @@ import (
 	"bingo-example/application/assembler"
 	"bingo-example/application/dto"
 	"bingo-example/application/service/common"
-	"bingo-example/domain/entity"
+	"bingo-example/domain/entity/book"
 	"context"
-	"fmt"
 	"github.com/olivere/elastic/v7"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -33,13 +32,13 @@ type BookService struct {
 
 // BatchImport 批量导入
 func (s *BookService) BatchImport() {
-	page, pageSize := 1, 500
+	page, pageSize := 1, 1000
 	wg := sync.WaitGroup{}
 
 	for {
 		// 从mysql获取数据
-		books := entity.Books{}
-		err := s.DB.Model(&entity.Book{}).Order("book_id desc").Limit(pageSize).Offset((page - 1) * pageSize).Find(&books).Error
+		books := book.Books{}
+		err := s.DB.Model(&book.Book{}).Order("id desc").Limit(pageSize).Offset((page - 1) * pageSize).Find(&books).Error
 		if err != nil || len(books) == 0 {
 			break
 		}
@@ -50,13 +49,17 @@ func (s *BookService) BatchImport() {
 
 			// 导入到es
 			bulk := s.Es.Bulk()
-			for _, book := range books {
+			for _, b := range books {
 				req := elastic.NewBulkIndexRequest()
-				req.Index(bookIndex).Id(strconv.Itoa(book.BookID)).Doc(book)
+				req.Index(bookIndex).Id(strconv.Itoa(b.ID)).Doc(b)
 				bulk.Add(req)
 			}
-			rep, err := bulk.Do(context.Background())
-			fmt.Println(rep, err)
+
+			if rep, err := bulk.Do(context.Background()); err != nil {
+				zap.L().Error("import book failed", zap.Error(err))
+			} else {
+				zap.L().Info("import book succeed", zap.Any("books", rep))
+			}
 		}()
 
 		page++
@@ -106,10 +109,10 @@ func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
 		if param.OrderSet.Score {
 			sort = append(sort, elastic.NewScoreSort().Desc())
 		}
-		if param.OrderSet.Price == entity.OrderByPriceAsc {
+		if param.OrderSet.Price == book.OrderByPriceAsc {
 			sort = append(sort, elastic.NewFieldSort(bookPrice1).Asc())
 		}
-		if param.OrderSet.Price == entity.OrderByPriceDesc {
+		if param.OrderSet.Price == book.OrderByPriceDesc {
 			sort = append(sort, elastic.NewFieldSort(bookPrice1).Desc())
 		}
 	}

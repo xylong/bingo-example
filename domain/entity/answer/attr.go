@@ -38,7 +38,7 @@ func WithContent(content string) Attribute {
 
 func WithIsCorrect(isCorrect bool) Attribute {
 	return func(answer *Answer) {
-		answer.IsCorrect = isCorrect
+		answer.IsCorrect = &isCorrect
 	}
 }
 

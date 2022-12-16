@@ -1,7 +1,7 @@
 package assembler
 
 import (
-	"bingo-example/domain/entity"
+	. "bingo-example/domain/entity/book"
 	"github.com/olivere/elastic/v7"
 	"reflect"
 )
@@ -9,15 +9,15 @@ import (
 type BookRep struct{}
 
 // Result2Slice elastic结果转为slice
-func (r *BookRep) Result2Slice(result *elastic.SearchResult) []*entity.Book {
+func (r *BookRep) Result2Slice(result *elastic.SearchResult) []*Book {
 	var (
-		book  *entity.Book
-		books []*entity.Book
+		book  *Book
+		books []*Book
 	)
 
 	t := reflect.TypeOf(book)
 	for _, b := range result.Each(t) {
-		books = append(books, b.(*entity.Book))
+		books = append(books, b.(*Book))
 	}
 
 	return books
