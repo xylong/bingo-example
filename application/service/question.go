@@ -3,6 +3,8 @@ package service
 import (
 	"bingo-example/application/assembler"
 	"bingo-example/application/dto"
+	"bingo-example/domain/aggregate"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -16,5 +18,13 @@ type QuestionService struct {
 
 // Create 创建
 func (s *QuestionService) Create(param *dto.QuestionParam) (int, string, interface{}) {
-	return 0, "", s.Req.Param2QuestionModel(param)
+	if err := new(aggregate.QuestionBank).
+		Builder(s.Req.Param2QuestionModel(param)).
+		SetQuestionRepo(s.DB).Build().
+		Create(); err != nil {
+		zap.L().Error("create question", zap.Error(err), zap.Any("param", param))
+		return -1, "题库创建失败", nil
+	}
+
+	return 0, "", nil
 }

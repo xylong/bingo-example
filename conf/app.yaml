@@ -16,7 +16,7 @@ mysql:
   host: 127.0.0.1
   port: 3306
   user: root
-  password: root
+  password: 123456
   db: test
   charset: utf8mb4
 
@@ -27,13 +27,13 @@ redis:
   db: 0
 
 mongo:
-  host: 1.14.58.91
+  host: 127.0.0.1
   port: 27017
-  user: cqcadmin
-  password: dsaASdsdoOyena
-  database: cqc
+  user: root
+  password: 123456
+  database: test
 
 elastic:
-  host: 43.136.220.57
+  host: 127.0.0.1
   port: 9200
   sniff: false
