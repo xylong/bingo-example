@@ -2,7 +2,6 @@ package core
 
 import (
 	"bingo-example/application/service"
-	"bingo-example/application/service/common"
 	. "bingo-example/lib/factory"
 )
 
@@ -11,11 +10,6 @@ type Service struct{}
 
 func NewService() *Service {
 	return &Service{}
-}
-
-// Es 创建elastic search服务
-func (s Service) Es() *common.ElasticSearch {
-	return new(ServiceFactory).Create(Es).(*common.ElasticSearch)
 }
 
 // Jwt 创建jwt

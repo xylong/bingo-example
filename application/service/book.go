@@ -3,7 +3,7 @@ package service
 import (
 	"bingo-example/application/assembler"
 	"bingo-example/application/dto"
-	"bingo-example/application/service/common"
+	"bingo-example/constants"
 	"bingo-example/domain/entity/book"
 	"context"
 	"github.com/olivere/elastic/v7"
@@ -13,21 +13,12 @@ import (
 	"sync"
 )
 
-// es
-const (
-	bookIndex  = "books"       // 📚es索引
-	bookName   = "book_name"   // 书名
-	bookPress  = "book_press"  // 出版社
-	bookPrice1 = "book_price1" // 价格1
-)
-
 type BookService struct {
 	Req *assembler.BookReq `inject:"-"`
 	Rep *assembler.BookRep `inject:"-"`
 
-	DB *gorm.DB `inject:"-"`
-
-	*common.ElasticSearch `inject:"-"`
+	DB *gorm.DB        `inject:"-"`
+	Es *elastic.Client `inject:"-"`
 }
 
 // BatchImport 批量导入
@@ -51,7 +42,7 @@ func (s *BookService) BatchImport() {
 			bulk := s.Es.Bulk()
 			for _, b := range books {
 				req := elastic.NewBulkIndexRequest()
-				req.Index(bookIndex).Id(strconv.Itoa(b.ID)).Doc(b)
+				req.Index(constants.BookIndex).Id(strconv.Itoa(b.ID)).Doc(b)
 				bulk.Add(req)
 			}
 
@@ -70,56 +61,11 @@ func (s *BookService) BatchImport() {
 
 // Search 📚搜索
 func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
-	var (
-		result  *elastic.SearchResult
-		sort    []elastic.Sorter
-		queries []elastic.Query
-		err     error
-	)
-
-	// 过滤
-	{
-		if param.Name != "" {
-			matchQuery := elastic.NewMatchQuery(bookName, param.Name)
-			queries = append(queries, matchQuery)
-		}
-
-		if param.Press != "" {
-			termsQuery := elastic.NewTermsQuery(bookPress, s.Req.FilterPress(param.Press)...)
-			queries = append(queries, termsQuery)
-		}
-
-		if param.Lowest > 0 || param.Highest > 0 {
-			rangeQuery := elastic.NewRangeQuery(bookPrice1)
-
-			if param.Lowest > 0 {
-				rangeQuery.Gte(param.Lowest)
-			}
-
-			if param.Highest > 0 {
-				rangeQuery.Lte(param.Highest)
-			}
-
-			queries = append(queries, rangeQuery)
-		}
-	}
-
-	// 排序
-	{
-		if param.OrderSet.Score {
-			sort = append(sort, elastic.NewScoreSort().Desc())
-		}
-		if param.OrderSet.Price == book.OrderByPriceAsc {
-			sort = append(sort, elastic.NewFieldSort(bookPrice1).Asc())
-		}
-		if param.OrderSet.Price == book.OrderByPriceDesc {
-			sort = append(sort, elastic.NewFieldSort(bookPrice1).Desc())
-		}
-	}
-
-	result, err = s.Es.Search().Index(bookIndex).Query(s.Must(queries...)).
-		SortBy(sort...).From(param.Offset()).Size(param.PageSize).
+	result, err := s.Es.Search().Index(constants.BookIndex).
+		Query(s.Req.Filter(param)).SortBy(s.Req.Sort(param.Sort)...).
+		From(param.Offset()).Size(param.PageSize).
 		Do(context.Background())
+
 	if err != nil {
 		zap.L().Error("search book error", zap.Error(err))
 		return nil
@@ -130,11 +76,13 @@ func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
 
 // GetPress 获取出版社
 func (s *BookService) GetPress() []interface{} {
-	collapse := elastic.NewCollapseBuilder(bookPress)
-	res, err := s.Es.Search().Index(bookIndex).Size(20).Collapse(collapse).FetchSource(false).Do(context.Background())
+	collapse := elastic.NewCollapseBuilder(constants.BookPress)
+	res, err := s.Es.Search().Index(constants.BookIndex).
+		Collapse(collapse).FetchSource(false).Size(20).
+		Do(context.Background())
 	if err != nil {
 		zap.L().Error("get book press error", zap.Error(err))
 	}
 
-	return s.Rep.Fields2Slice(res, bookPress)
+	return s.Rep.Fields2Slice(res, constants.BookPress)
 }
