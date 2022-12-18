@@ -32,6 +32,10 @@ func (c *BookController) press(ctx *bingo.Context) interface{} {
 	return c.Service.GetPress()
 }
 
+func (c *BookController) graph(ctx *bingo.Context) interface{} {
+	return c.Service.GraphSearch()
+}
+
 func (c *BookController) Name() string {
 	return "BookController"
 }
@@ -40,4 +44,5 @@ func (c *BookController) Route(group *bingo.Group) {
 	group.GET("import", c.import2es)
 	group.GET("books", c.search)
 	group.GET("presses", c.press)
+	group.GET("graph", c.graph)
 }

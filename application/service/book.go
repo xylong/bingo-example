@@ -6,6 +6,7 @@ import (
 	"bingo-example/constants"
 	"bingo-example/domain/entity/book"
 	"context"
+	"github.com/graphql-go/graphql"
 	"github.com/olivere/elastic/v7"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -85,4 +86,19 @@ func (s *BookService) GetPress() []interface{} {
 	}
 
 	return s.Rep.Fields2Slice(res, constants.BookPress)
+}
+
+func (s *BookService) GraphSearch() interface{} {
+	param := graphql.Params{
+		Schema:        book.Schema(),
+		RequestString: constants.BookRequest,
+	}
+
+	result := graphql.Do(param)
+	if result.HasErrors() {
+		zap.L().Error("graph search", zap.Any("param", param), zap.Any("error", result.Errors))
+		return nil
+	}
+
+	return result
 }

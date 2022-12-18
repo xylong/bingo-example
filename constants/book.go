@@ -19,3 +19,15 @@ const (
 	BookDateDesc              // 出版日期降序
 	BookDateAsc               // 出版日期升序
 )
+
+const (
+	// BookRequest graphql请求字符串
+	BookRequest = `
+query{
+	Book{
+		id
+		name
+	}
+}
+`
+)
