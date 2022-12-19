@@ -1,5 +1,9 @@
 package book
 
+import (
+	"github.com/graphql-go/graphql"
+)
+
 const (
 	OrderByPriceAsc  = iota + 1 // 价格从低到高
 	OrderByPriceDesc            // 价格从高到低
@@ -25,4 +29,24 @@ func New(attributes ...Attribute) *Book {
 	b := &Book{}
 	Attributes(attributes).Apply(b)
 	return b
+}
+
+// Graph 实体映射图表
+func Graph() *graphql.Object {
+	return graphql.NewObject(graphql.ObjectConfig{
+		Name: "BookModel",
+		Fields: graphql.Fields{
+			"id":       &graphql.Field{Type: graphql.Int},
+			"name":     &graphql.Field{Type: graphql.String},
+			"blurb":    &graphql.Field{Type: graphql.String},
+			"price1":   &graphql.Field{Type: graphql.Float},
+			"price2":   &graphql.Field{Type: graphql.Float},
+			"author":   &graphql.Field{Type: graphql.String},
+			"press":    &graphql.Field{Type: graphql.String},
+			"date":     &graphql.Field{Type: graphql.String},
+			"kind":     &graphql.Field{Type: graphql.Int},
+			"kind_str": &graphql.Field{Type: graphql.String},
+		},
+		Description: "📚",
+	})
 }

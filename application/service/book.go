@@ -5,10 +5,11 @@ import (
 	"bingo-example/application/dto"
 	"bingo-example/constants"
 	"bingo-example/domain/entity/book"
-	"bingo-example/infrastructure/dao/graph"
+	"bingo-example/infrastructure/dao/g"
 	"context"
 	"github.com/graphql-go/graphql"
 	"github.com/olivere/elastic/v7"
+	"github.com/xylong/bingo/ioc"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"strconv"
@@ -63,17 +64,20 @@ func (s *BookService) BatchImport() {
 
 // Search 📚搜索
 func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
-	result, err := s.Es.Search().Index(constants.BookIndex).
-		Query(s.Req.Filter(param)).SortBy(s.Req.Sort(param.Sorts)...).
-		From(param.Offset()).Size(param.PageSize).
-		Do(context.Background())
-
+	result, err := s.search(param)
 	if err != nil {
 		zap.L().Error("search book error", zap.Error(err))
 		return nil
 	}
 
 	return s.Rep.Result2Slice(result)
+}
+
+func (s *BookService) search(param *dto.BookSearchParam) (*elastic.SearchResult, error) {
+	return s.Es.Search().Index(constants.BookIndex).
+		Query(s.Req.Filter(param)).SortBy(s.Req.Sort(param.Sorts)...).
+		From(param.Offset()).Size(param.PageSize).
+		Do(context.Background())
 }
 
 // GetPress 获取出版社
@@ -92,7 +96,7 @@ func (s *BookService) GetPress() []interface{} {
 
 func (s *BookService) GraphSearch() interface{} {
 	param := graphql.Params{
-		Schema:        graph.Schema(),
+		Schema:        s.GraphSchema(),
 		RequestString: constants.BookRequest,
 	}
 
@@ -103,4 +107,50 @@ func (s *BookService) GraphSearch() interface{} {
 	}
 
 	return result
+}
+
+func (s *BookService) GraphSchema() graphql.Schema {
+	schema, err := graphql.NewSchema(graphql.SchemaConfig{
+		Query: s.graphQuery(),
+	})
+
+	if err != nil {
+		zap.L().Error("book schema", zap.Error(err))
+	}
+
+	return schema
+}
+
+func (s *BookService) graphQuery() *graphql.Object {
+	return graphql.NewObject(graphql.ObjectConfig{
+		Name: "BookQuery",
+		Fields: graphql.Fields{
+			"Book": &graphql.Field{
+				Type: book.Graph(),
+				Args: map[string]*graphql.ArgumentConfig{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.Int,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if v, ok := p.Args["id"]; ok {
+						db := ioc.Factory.Get((*gorm.DB)(nil))
+						return g.NewBookRepo(db.(*gorm.DB)).GetByID(v.(int))
+					} else {
+						return nil, nil
+					}
+				},
+			},
+			"Search": &graphql.Field{
+				Type: graphql.NewList(book.Graph()),
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if result, err := s.Es.Search().Index(constants.BookIndex).Do(context.Background()); err != nil {
+						return nil, err
+					} else {
+						return s.Rep.Result2Books(result), nil
+					}
+				},
+			},
+		},
+	})
 }

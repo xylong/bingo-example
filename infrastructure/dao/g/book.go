@@ -18,3 +18,9 @@ func (r *BookRepo) GetByID(id int) (*Book, error) {
 	err := r.db.First(book, id).Error
 	return book, err
 }
+
+func (r *BookRepo) Get() ([]*Book, error) {
+	var books []*Book
+	err := r.db.Limit(10).Offset(1).Find(&books).Error
+	return books, err
+}

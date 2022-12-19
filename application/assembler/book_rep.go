@@ -37,3 +37,16 @@ func (r *BookRep) Fields2Slice(result *elastic.SearchResult, key string) []inter
 
 	return res
 }
+
+func (r *BookRep) Result2Books(result *elastic.SearchResult) []*Book {
+	var (
+		books []*Book
+		book  *Book
+	)
+
+	for _, item := range result.Each(reflect.TypeOf(book)) {
+		books = append(books, item.(*Book))
+	}
+
+	return books
+}
