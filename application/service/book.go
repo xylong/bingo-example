@@ -3,8 +3,10 @@ package service
 import (
 	"bingo-example/application/assembler"
 	"bingo-example/application/dto"
+	"bingo-example/constants"
 	"bingo-example/domain/entity/book"
 	"context"
+	"github.com/graphql-go/graphql"
 	"github.com/olivere/elastic/v7"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -41,7 +43,7 @@ func (s *BookService) BatchImport() {
 			bulk := s.Es.Bulk()
 			for _, b := range books {
 				req := elastic.NewBulkIndexRequest()
-				req.Index(assembler.BookIndex).Id(strconv.Itoa(b.ID)).Doc(b)
+				req.Index(constants.BookIndex).Id(strconv.Itoa(b.ID)).Doc(b)
 				bulk.Add(req)
 			}
 
@@ -60,10 +62,11 @@ func (s *BookService) BatchImport() {
 
 // Search 📚搜索
 func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
-	result, err := s.Es.Search().Index(assembler.BookIndex).
-		Query(s.Req.Query(param)).SortBy(s.Req.Sort(param.Sorts)...).
+	result, err := s.Es.Search().Index(constants.BookIndex).
+		Query(s.Req.Filter(param)).SortBy(s.Req.Sort(param.Sorts)...).
 		From(param.Offset()).Size(param.PageSize).
 		Do(context.Background())
+
 	if err != nil {
 		zap.L().Error("search book error", zap.Error(err))
 		return nil
@@ -74,11 +77,29 @@ func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
 
 // GetPress 获取出版社
 func (s *BookService) GetPress() []interface{} {
-	collapse := elastic.NewCollapseBuilder(assembler.BookPress)
-	res, err := s.Es.Search().Index(assembler.BookIndex).Size(20).Collapse(collapse).FetchSource(false).Do(context.Background())
+	collapse := elastic.NewCollapseBuilder(constants.BookPress)
+	res, err := s.Es.Search().Index(constants.BookIndex).
+		Collapse(collapse).FetchSource(false).Size(20).
+		Do(context.Background())
+
 	if err != nil {
 		zap.L().Error("get book press error", zap.Error(err))
 	}
 
-	return s.Rep.Fields2Slice(res, assembler.BookPress)
+	return s.Rep.Fields2Slice(res, constants.BookPress)
+}
+
+func (s *BookService) GraphSearch() interface{} {
+	param := graphql.Params{
+		Schema:        book.Schema(),
+		RequestString: constants.BookRequest,
+	}
+
+	result := graphql.Do(param)
+	if result.HasErrors() {
+		zap.L().Error("graph search", zap.Any("param", param), zap.Any("error", result.Errors))
+		return nil
+	}
+
+	return result
 }
