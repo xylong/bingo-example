@@ -30,28 +30,6 @@ var (
 
 type BookReq struct{}
 
-// MatchName 匹配书籍名称
-func (r *BookReq) MatchName(name string) *elastic.MatchQuery {
-	return elastic.NewMatchQuery(BookName, name)
-}
-
-// MatchBlurb 匹配简介
-func (r *BookReq) MatchBlurb(blurb string) *elastic.MatchQuery {
-	return elastic.NewMatchQuery(BookBlurb, blurb)
-}
-
-// InPress 出版社
-func (r *BookReq) InPress(presses string) *elastic.TermsQuery {
-	var s []interface{}
-
-	arr := strings.Split(presses, ",")
-	for _, item := range arr {
-		s = append(s, item)
-	}
-
-	return elastic.NewTermsQuery(BookPress, s...)
-}
-
 // Filter 过滤
 func (r *BookReq) Filter(param *dto.BookSearchParam) *elastic.BoolQuery {
 	var queries []elastic.Query
@@ -76,6 +54,11 @@ func (r *BookReq) Filter(param *dto.BookSearchParam) *elastic.BoolQuery {
 // NameQuery 书名检索
 func (r BookReq) NameQuery(name string) *elastic.MatchQuery {
 	return elastic.NewMatchQuery(BookName, name)
+}
+
+// WildcardName 匹配书名
+func (r *BookReq) WildcardName(pattern string) *elastic.WildcardQuery {
+	return elastic.NewWildcardQuery(BookName, pattern)
 }
 
 // PressQuery 出版社检索

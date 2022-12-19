@@ -64,20 +64,17 @@ func (s *BookService) BatchImport() {
 
 // Search 📚搜索
 func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
-	result, err := s.search(param)
+	result, err := s.Es.Search().Index(constants.BookIndex).
+		Query(s.Req.Filter(param)).SortBy(s.Req.Sort(param.Sorts)...).
+		From(param.Offset()).Size(param.PageSize).
+		Do(context.Background())
+
 	if err != nil {
 		zap.L().Error("search book error", zap.Error(err))
 		return nil
 	}
 
 	return s.Rep.Result2Slice(result)
-}
-
-func (s *BookService) search(param *dto.BookSearchParam) (*elastic.SearchResult, error) {
-	return s.Es.Search().Index(constants.BookIndex).
-		Query(s.Req.Filter(param)).SortBy(s.Req.Sort(param.Sorts)...).
-		From(param.Offset()).Size(param.PageSize).
-		Do(context.Background())
 }
 
 // GetPress 获取出版社
@@ -143,8 +140,15 @@ func (s *BookService) graphQuery() *graphql.Object {
 			},
 			"Search": &graphql.Field{
 				Type: graphql.NewList(book.Graph()),
+				Args: graphql.FieldConfigArgument{
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if result, err := s.Es.Search().Index(constants.BookIndex).Do(context.Background()); err != nil {
+					if result, err := s.Es.Search().Index(constants.BookIndex).
+						Query(s.Req.WildcardName(p.Args["name"].(string))).
+						Do(context.Background()); err != nil {
 						return nil, err
 					} else {
 						return s.Rep.Result2Books(result), nil
