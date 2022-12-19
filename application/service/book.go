@@ -5,6 +5,7 @@ import (
 	"bingo-example/application/dto"
 	"bingo-example/constants"
 	"bingo-example/domain/entity/book"
+	"bingo-example/infrastructure/dao/graph"
 	"context"
 	"github.com/graphql-go/graphql"
 	"github.com/olivere/elastic/v7"
@@ -91,7 +92,7 @@ func (s *BookService) GetPress() []interface{} {
 
 func (s *BookService) GraphSearch() interface{} {
 	param := graphql.Params{
-		Schema:        book.Schema(),
+		Schema:        graph.Schema(),
 		RequestString: constants.BookRequest,
 	}
 

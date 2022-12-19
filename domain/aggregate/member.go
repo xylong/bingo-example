@@ -18,8 +18,8 @@ type Member struct {
 	// Logs 登录日志
 	Logs []*entity.LoginLog
 
-	UserRepo    repository.UserRepo
-	ProfileRepo repository.ProfileRepo
+	UserRepo    repository.IUserRepo
+	ProfileRepo repository.IProfileRepo
 }
 
 func (m *Member) Builder(u *user.User) *MemberBuilder {

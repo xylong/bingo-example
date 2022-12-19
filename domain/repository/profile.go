@@ -2,7 +2,7 @@ package repository
 
 import "bingo-example/domain/entity/profile"
 
-// ProfileRepo 用户信息
-type ProfileRepo interface {
+// IProfileRepo 用户信息
+type IProfileRepo interface {
 	Create(*profile.Profile) error
 }

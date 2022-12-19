@@ -3,6 +3,8 @@ package v1
 import (
 	"bingo-example/application/dto"
 	"bingo-example/application/service"
+	"bingo-example/infrastructure/dao/graph"
+	"github.com/graphql-go/handler"
 	"github.com/xylong/bingo"
 )
 
@@ -44,5 +46,12 @@ func (c *BookController) Route(group *bingo.Group) {
 	group.GET("import", c.import2es)
 	group.GET("books", c.search)
 	group.GET("presses", c.press)
-	group.GET("graph", c.graph)
+
+	group.POST("book", func(ctx *bingo.Context) {
+		schema := graph.Schema()
+		h := handler.New(&handler.Config{
+			Schema: &schema,
+		})
+		h.ServeHTTP(ctx.Writer, ctx.Request)
+	})
 }

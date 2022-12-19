@@ -25,7 +25,7 @@ const (
 	// BookRequest graphql请求字符串
 	BookRequest = `
 query{
-	Book{
+	Book(id:256){
 		id
 		name
 	}

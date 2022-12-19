@@ -5,15 +5,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type QuestionDao struct {
+type QuestionRepo struct {
 	db *gorm.DB
 }
 
-func NewQuestionDao(db *gorm.DB) *QuestionDao {
-	return &QuestionDao{db: db}
+func NewQuestionRepo(db *gorm.DB) *QuestionRepo {
+	return &QuestionRepo{db: db}
 }
 
 // Create 创建
-func (d QuestionDao) Create(question *question.Question) error {
+func (d QuestionRepo) Create(question *question.Question) error {
 	return d.db.Create(question).Error
 }

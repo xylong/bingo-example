@@ -16,8 +16,8 @@ type MemberBuilder struct {
 	profile *profile.Profile
 	logs    []*entity.LoginLog
 
-	userRepo    repository.UserRepo
-	profileRepo repository.ProfileRepo
+	userRepo    repository.IUserRepo
+	profileRepo repository.IProfileRepo
 }
 
 func (m *MemberBuilder) SetLogs(logs []*entity.LoginLog) *MemberBuilder {
@@ -37,12 +37,12 @@ func (m *MemberBuilder) SetProfile(profile *profile.Profile) *MemberBuilder {
 }
 
 func (m *MemberBuilder) SetUserRepo(db *gorm.DB) *MemberBuilder {
-	m.userRepo = g.NewUserDao(db)
+	m.userRepo = g.NewUserRepo(db)
 	return m
 }
 
 func (m *MemberBuilder) SetProfileRepo(db *gorm.DB) *MemberBuilder {
-	m.profileRepo = g.NewProfileDao(db)
+	m.profileRepo = g.NewProfileRepo(db)
 	return m
 }
 

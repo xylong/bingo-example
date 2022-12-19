@@ -5,19 +5,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserDao struct {
+type UserRepo struct {
 	db *gorm.DB
 }
 
-func NewUserDao(db *gorm.DB) *UserDao {
-	return &UserDao{db: db}
+func NewUserRepo(db *gorm.DB) *UserRepo {
+	return &UserRepo{db: db}
 }
 
-func (d *UserDao) Create(user *user.User) error {
+func (d *UserRepo) Create(user *user.User) error {
 	return d.db.Create(user).Error
 }
 
-func (d *UserDao) Get(user *user.User, with ...string) error {
+func (d *UserRepo) Get(user *user.User, with ...string) error {
 	if len(with) > 0 {
 		for _, s := range with {
 			d.db = d.db.Preload(s)

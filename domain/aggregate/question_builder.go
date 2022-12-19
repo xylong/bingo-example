@@ -14,7 +14,7 @@ type questionBankBuilder struct {
 	question *question.Question
 	answers  []*answer.Answer
 
-	questionRepo repository.QuestionRepo
+	questionRepo repository.IQuestionRepo
 }
 
 func newQuestionBankBuilder(question *question.Question) *questionBankBuilder {
@@ -31,7 +31,7 @@ func (b *questionBankBuilder) SetAnswer(answers []*answer.Answer) *questionBankB
 
 func (b *questionBankBuilder) SetQuestionRepo(db *gorm.DB) *questionBankBuilder {
 	if db != nil {
-		b.questionRepo = g.NewQuestionDao(db)
+		b.questionRepo = g.NewQuestionRepo(db)
 	} else {
 		zap.L().Warn("question repo is nil")
 	}

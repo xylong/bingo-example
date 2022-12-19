@@ -14,7 +14,7 @@ type QuestionBank struct {
 	// 答案
 	Answers []*answer.Answer
 
-	QuestionRepo repository.QuestionRepo
+	QuestionRepo repository.IQuestionRepo
 }
 
 func (b *QuestionBank) Builder(question *question.Question) *questionBankBuilder {
