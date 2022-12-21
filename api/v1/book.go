@@ -31,6 +31,10 @@ func (c *BookController) index(ctx *bingo.Context) {
 	}).ServeHTTP(ctx.Writer, ctx.Request)
 }
 
+func (c *BookController) show(ctx *bingo.Context) interface{} {
+	return c.Service.GetByID(ctx.Param("id"))
+}
+
 func (c *BookController) search(ctx *bingo.Context) interface{} {
 	return c.Service.Search(
 		ctx.Binding(ctx.ShouldBind, &dto.BookSearchParam{}).
@@ -48,6 +52,7 @@ func (c *BookController) Name() string {
 func (c *BookController) Route(group *bingo.Group) {
 	group.GET("import", c.import2es)
 	group.GET("books", c.search)
+	group.GET("books/:id", c.show)
 	group.GET("presses", c.press)
 	group.POST("book", c.index)
 }

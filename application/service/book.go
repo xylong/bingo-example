@@ -158,3 +158,11 @@ func (s *BookService) graphQuery() *graphql.Object {
 		},
 	})
 }
+
+func (s *BookService) GetByID(id string) interface{} {
+	res, err := s.Es.Get().Index(constants.BookIndex).Id(id).Do(context.Background())
+	if err != nil {
+		return nil
+	}
+	return res.Source
+}
