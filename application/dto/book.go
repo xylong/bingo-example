@@ -22,4 +22,9 @@ type (
 		Date   string  `form:"date" json:"date" binding:"omitempty,date"`                                                 // 出版日期
 		Kind   uint8   `form:"kind" json:"kind" binding:"required,oneof=1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19"` // 分类
 	}
+
+	// BookUrlRequest url参数
+	BookUrlRequest struct {
+		ID int `uri:"id" json:"id" binding:"required,gt=0"`
+	}
 )

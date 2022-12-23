@@ -173,13 +173,14 @@ func (s *BookService) GetByID(id string) interface{} {
 // Create 创建
 func (s *BookService) Create(param *dto.BookStoreParam) error {
 	b := s.Req.StoreParam2Book(param)
-	err := g.NewBookRepo(s.DB).Create(b)
-	if err != nil {
+	if err := g.NewBookRepo(s.DB).Create(b); err != nil {
 		zap.L().Error("create book", zap.Error(err), zap.Any("book", b))
 		return fmt.Errorf("创建失败")
 	}
 
-	if _, err = s.Es.Index().Index(constants.BookIndex).Id(strconv.Itoa(b.ID)).BodyJson(b).Do(context.Background()); err != nil {
+	if _, err := s.Es.Index().Index(constants.BookIndex).
+		Id(strconv.Itoa(b.ID)).BodyJson(b).
+		Do(context.Background()); err != nil {
 		zap.L().Error("create book", zap.Error(err))
 	}
 
@@ -187,16 +188,16 @@ func (s *BookService) Create(param *dto.BookStoreParam) error {
 }
 
 // Update 更新
-func (s *BookService) Update(id int, param *dto.BookStoreParam) error {
-	b := s.Req.StoreParam2Book(param, id)
-	err := g.NewBookRepo(s.DB).Update(b)
-	if err != nil {
+func (s *BookService) Update(request *dto.BookUrlRequest, param *dto.BookStoreParam) error {
+	b := s.Req.StoreParam2Book(param, request)
+	if err := g.NewBookRepo(s.DB).Update(b); err != nil {
 		zap.L().Error("update book", zap.Error(err), zap.Any("book", b))
 		return fmt.Errorf("更新失败")
 	}
 
-	_, err = s.Es.Update().Index(constants.BookIndex).Id(strconv.Itoa(id)).Doc(b).Refresh("true").Do(context.Background())
-	if err != nil {
+	if _, err := s.Es.Update().Index(constants.BookIndex).
+		Id(strconv.Itoa(b.ID)).Doc(b).Refresh("true").
+		Do(context.Background()); err != nil {
 		zap.L().Error("update book", zap.Error(err))
 	}
 
