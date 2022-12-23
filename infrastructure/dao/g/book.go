@@ -28,3 +28,7 @@ func (r *BookRepo) Get() ([]*Book, error) {
 func (r *BookRepo) Create(book *Book) error {
 	return r.db.Create(book).Error
 }
+
+func (r *BookRepo) Update(book *Book) error {
+	return r.db.Updates(book).Error
+}

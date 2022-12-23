@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/graphql-go/handler"
 	"github.com/xylong/bingo"
+	"strconv"
 )
 
 func init() {
@@ -55,6 +56,21 @@ func (c *BookController) create(ctx *bingo.Context) interface{} {
 	return c.Service.Create(param)
 }
 
+func (c *BookController) update(ctx *bingo.Context) interface{} {
+	param := &dto.BookStoreParam{}
+	if err := ctx.ShouldBind(param); err != nil {
+		return gin.H{"msg": err.Error()}
+	}
+
+	id := ctx.Param("id")
+	_id, err := strconv.Atoi(id)
+	if err != nil {
+		return gin.H{"msg": err.Error()}
+	}
+
+	return c.Service.Update(_id, param)
+}
+
 func (c *BookController) Name() string {
 	return "BookController"
 }
@@ -66,4 +82,5 @@ func (c *BookController) Route(group *bingo.Group) {
 	group.GET("presses", c.press)
 	group.POST("book", c.index)
 	group.POST("books", c.create)
+	group.PUT("books/:id", c.update)
 }

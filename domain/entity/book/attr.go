@@ -11,7 +11,7 @@ func (a Attributes) Apply(book *Book) {
 	}
 }
 
-func WithBookID(id int) Attribute {
+func WithID(id int) Attribute {
 	return func(book *Book) {
 		if id > 0 {
 			book.ID = id
@@ -19,7 +19,7 @@ func WithBookID(id int) Attribute {
 	}
 }
 
-func WithBookName(name string) Attribute {
+func WithName(name string) Attribute {
 	return func(book *Book) {
 		if name != "" {
 			book.Name = name
@@ -27,7 +27,7 @@ func WithBookName(name string) Attribute {
 	}
 }
 
-func WithBookBlurb(blurb string) Attribute {
+func WithBlurb(blurb string) Attribute {
 	return func(book *Book) {
 		if blurb != "" {
 			book.Blurb = blurb
@@ -35,7 +35,7 @@ func WithBookBlurb(blurb string) Attribute {
 	}
 }
 
-func WithBookPrice1(price float64) Attribute {
+func WithPrice1(price float64) Attribute {
 	return func(book *Book) {
 		if price >= 0 {
 			book.Price1 = price
@@ -43,7 +43,7 @@ func WithBookPrice1(price float64) Attribute {
 	}
 }
 
-func WithBookPrice2(price float64) Attribute {
+func WithPrice2(price float64) Attribute {
 	return func(book *Book) {
 		if price >= 0 {
 			book.Price2 = price
@@ -51,7 +51,7 @@ func WithBookPrice2(price float64) Attribute {
 	}
 }
 
-func WithBookAuthor(author string) Attribute {
+func WithAuthor(author string) Attribute {
 	return func(book *Book) {
 		if author != "" {
 			book.Author = author
@@ -59,7 +59,7 @@ func WithBookAuthor(author string) Attribute {
 	}
 }
 
-func WithBookPress(press string) Attribute {
+func WithPress(press string) Attribute {
 	return func(book *Book) {
 		if press != "" {
 			book.Press = press
@@ -67,7 +67,7 @@ func WithBookPress(press string) Attribute {
 	}
 }
 
-func WithBookDate(date string) Attribute {
+func WithDate(date string) Attribute {
 	return func(book *Book) {
 		if date != "" {
 			book.Date = date
@@ -75,7 +75,7 @@ func WithBookDate(date string) Attribute {
 	}
 }
 
-func WithBookKind(kind uint8) Attribute {
+func WithKind(kind uint8) Attribute {
 	return func(book *Book) {
 		if kind > 0 {
 			book.Kind = kind
@@ -83,7 +83,7 @@ func WithBookKind(kind uint8) Attribute {
 	}
 }
 
-func WithBookKindStr(kindStr string) Attribute {
+func WithKindStr(kindStr string) Attribute {
 	return func(book *Book) {
 		if kindStr != "" {
 			book.KindStr = kindStr

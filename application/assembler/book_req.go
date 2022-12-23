@@ -113,15 +113,21 @@ func (r *BookReq) Sort(sort string) []elastic.Sorter {
 	return sorts
 }
 
-func (r *BookReq) Param2Book(param *dto.BookStoreParam) *book.Book {
-	return book.New(
-		book.WithBookName(param.Name),
-		book.WithBookBlurb(param.Blurb),
-		book.WithBookPrice1(param.Price1),
-		book.WithBookPrice2(param.Price2),
-		book.WithBookAuthor(param.Author),
-		book.WithBookPress(param.Press),
-		book.WithBookDate(param.Press),
-		book.WithBookKind(param.Kind),
+func (r *BookReq) StoreParam2Book(param *dto.BookStoreParam, id ...int) *book.Book {
+	b := book.New(
+		book.WithName(param.Name),
+		book.WithBlurb(param.Blurb),
+		book.WithPrice1(param.Price1),
+		book.WithPrice2(param.Price2),
+		book.WithAuthor(param.Author),
+		book.WithPress(param.Press),
+		book.WithDate(param.Press),
+		book.WithKind(param.Kind),
 	)
+
+	if len(id) > 0 {
+		b.ID = id[0]
+	}
+
+	return b
 }

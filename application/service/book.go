@@ -172,7 +172,7 @@ func (s *BookService) GetByID(id string) interface{} {
 
 // Create 创建
 func (s *BookService) Create(param *dto.BookStoreParam) error {
-	b := s.Req.Param2Book(param)
+	b := s.Req.StoreParam2Book(param)
 	err := g.NewBookRepo(s.DB).Create(b)
 	if err != nil {
 		zap.L().Error("create book", zap.Error(err), zap.Any("book", b))
@@ -181,6 +181,23 @@ func (s *BookService) Create(param *dto.BookStoreParam) error {
 
 	if _, err = s.Es.Index().Index(constants.BookIndex).Id(strconv.Itoa(b.ID)).BodyJson(b).Do(context.Background()); err != nil {
 		zap.L().Error("create book", zap.Error(err))
+	}
+
+	return nil
+}
+
+// Update 更新
+func (s *BookService) Update(id int, param *dto.BookStoreParam) error {
+	b := s.Req.StoreParam2Book(param, id)
+	err := g.NewBookRepo(s.DB).Update(b)
+	if err != nil {
+		zap.L().Error("update book", zap.Error(err), zap.Any("book", b))
+		return fmt.Errorf("更新失败")
+	}
+
+	_, err = s.Es.Update().Index(constants.BookIndex).Id(strconv.Itoa(id)).Doc(b).Refresh("true").Do(context.Background())
+	if err != nil {
+		zap.L().Error("update book", zap.Error(err))
 	}
 
 	return nil
