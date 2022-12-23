@@ -115,7 +115,7 @@ func (r *BookReq) Sort(sort string) []elastic.Sorter {
 
 // StoreParam2Book 书籍表单参数转模型
 func (r *BookReq) StoreParam2Book(param *dto.BookStoreParam, request ...*dto.BookUrlRequest) *book.Book {
-	b := book.New(
+	attrs := []book.Attribute{
 		book.WithName(param.Name),
 		book.WithBlurb(param.Blurb),
 		book.WithPrice1(param.Price1),
@@ -124,11 +124,11 @@ func (r *BookReq) StoreParam2Book(param *dto.BookStoreParam, request ...*dto.Boo
 		book.WithPress(param.Press),
 		book.WithDate(param.Press),
 		book.WithKind(param.Kind),
-	)
-
-	if len(request) > 0 {
-		b.ID = request[0].ID
 	}
 
-	return b
+	if len(request) > 0 {
+		attrs = append(attrs, book.WithID(request[0].ID))
+	}
+
+	return book.New(attrs...)
 }
