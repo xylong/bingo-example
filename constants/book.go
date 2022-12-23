@@ -32,3 +32,26 @@ query{
 }
 `
 )
+
+const (
+	_ = iota
+	Program
+	Php
+	Java
+	Go
+	Web
+	Python
+	Other
+	C
+	Html
+	System
+	Database
+	InformationSafety
+	LevelExamination
+	Textbook
+	OperatingSystem
+	ComputerTheory
+	ArtificialIntelligence
+	IT
+	MobileDevelopment
+)

@@ -5,6 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/xylong/bingo"
 	"go.uber.org/zap"
+	"time"
 )
 
 var valid *validator.Validate
@@ -18,6 +19,7 @@ func init() {
 
 	_ = bingo.RegisterBindTag("phone", CheckPhone)
 	_ = bingo.RegisterBindTag("sms", Field("required").toFunc())
+	_ = bingo.RegisterBindTag("date", CheckDate)
 }
 
 var (
@@ -40,4 +42,15 @@ type Field string
 func (f Field) toFunc() validator.Func {
 	bingo.ValidateMessage["field"] = "验证码必填"
 	return CheckSms
+}
+
+// CheckDate 检测日期格式
+func CheckDate(fl validator.FieldLevel) bool {
+	v, ok := fl.Field().Interface().(string)
+	if !ok {
+		return false
+	}
+
+	_, err := time.Parse("2006-01-02", v)
+	return err == nil
 }

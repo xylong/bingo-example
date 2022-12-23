@@ -3,6 +3,7 @@ package assembler
 import (
 	"bingo-example/application/dto"
 	. "bingo-example/constants"
+	"bingo-example/domain/entity/book"
 	"github.com/olivere/elastic/v7"
 	"strconv"
 	"strings"
@@ -110,4 +111,17 @@ func (r *BookReq) Sort(sort string) []elastic.Sorter {
 	}
 
 	return sorts
+}
+
+func (r *BookReq) Param2Book(param *dto.BookStoreParam) *book.Book {
+	return book.New(
+		book.WithBookName(param.Name),
+		book.WithBookBlurb(param.Blurb),
+		book.WithBookPrice1(param.Price1),
+		book.WithBookPrice2(param.Price2),
+		book.WithBookAuthor(param.Author),
+		book.WithBookPress(param.Press),
+		book.WithBookDate(param.Press),
+		book.WithBookKind(param.Kind),
+	)
 }

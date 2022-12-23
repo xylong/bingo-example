@@ -16,8 +16,12 @@
   }
 }
 ```
+
+
 - PUT /books
 - GET /books/_mapping
 - GET /books/_count
 - GET /books/_search
-- GET /_cat/plugins
+- GET /books/_doc/1?_source_includes=*&_source_excludes=*time
+- GET /_cat/plugins 查看插件信息
+- GET /{index}/{type}/{id}/_termvectors?fields={fields_name} 查看某个字段数据的分词结果

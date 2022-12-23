@@ -24,3 +24,7 @@ func (r *BookRepo) Get() ([]*Book, error) {
 	err := r.db.Limit(10).Offset(1).Find(&books).Error
 	return books, err
 }
+
+func (r *BookRepo) Create(book *Book) error {
+	return r.db.Create(book).Error
+}

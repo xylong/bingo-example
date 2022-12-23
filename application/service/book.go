@@ -7,6 +7,7 @@ import (
 	"bingo-example/domain/entity/book"
 	"bingo-example/infrastructure/dao/g"
 	"context"
+	"fmt"
 	"github.com/graphql-go/graphql"
 	"github.com/olivere/elastic/v7"
 	"github.com/xylong/bingo/ioc"
@@ -159,10 +160,28 @@ func (s *BookService) graphQuery() *graphql.Object {
 	})
 }
 
+// GetByID 详情
 func (s *BookService) GetByID(id string) interface{} {
-	res, err := s.Es.Get().Index(constants.BookIndex).Id(id).Do(context.Background())
-	if err != nil {
+	if res, err := s.Es.Get().Index(constants.BookIndex).Id(id).Do(context.Background()); err != nil {
+		zap.L().Warn("not found", zap.Error(err), zap.String("id", id))
 		return nil
+	} else {
+		return res.Source
 	}
-	return res.Source
+}
+
+// Create 创建
+func (s *BookService) Create(param *dto.BookStoreParam) error {
+	b := s.Req.Param2Book(param)
+	err := g.NewBookRepo(s.DB).Create(b)
+	if err != nil {
+		zap.L().Error("create book", zap.Error(err), zap.Any("book", b))
+		return fmt.Errorf("创建失败")
+	}
+
+	if _, err = s.Es.Index().Index(constants.BookIndex).Id(strconv.Itoa(b.ID)).BodyJson(b).Do(context.Background()); err != nil {
+		zap.L().Error("create book", zap.Error(err))
+	}
+
+	return nil
 }
