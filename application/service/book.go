@@ -27,7 +27,7 @@ type BookService struct {
 }
 
 // BatchImport 批量导入
-func (s *BookService) BatchImport() {
+func (s *BookService) BatchImport(ctx context.Context) {
 	page, pageSize := 1, 1000
 	wg := sync.WaitGroup{}
 
@@ -51,7 +51,7 @@ func (s *BookService) BatchImport() {
 				bulk.Add(req)
 			}
 
-			if rep, err := bulk.Do(context.Background()); err != nil {
+			if rep, err := bulk.Do(ctx); err != nil {
 				zap.L().Error("import book failed", zap.Error(err))
 			} else {
 				zap.L().Info("import book succeed", zap.Any("books", rep))
@@ -65,11 +65,11 @@ func (s *BookService) BatchImport() {
 }
 
 // Search 搜索
-func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
+func (s *BookService) Search(ctx context.Context, param *dto.BookSearchParam) interface{} {
 	result, err := s.Es.Search().Index(constants.BookIndex).
 		Query(s.Req.Filter(param)).SortBy(s.Req.Sort(param.Sorts)...).
 		From(param.Offset()).Size(param.PageSize).
-		Do(context.Background())
+		Do(ctx)
 
 	if err != nil {
 		zap.L().Error("search book error", zap.Error(err))
@@ -80,11 +80,11 @@ func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
 }
 
 // GetPress 获取出版社
-func (s *BookService) GetPress() []interface{} {
+func (s *BookService) GetPress(ctx context.Context) []interface{} {
 	collapse := elastic.NewCollapseBuilder(constants.BookPress)
 	res, err := s.Es.Search().Index(constants.BookIndex).
 		Collapse(collapse).FetchSource(false).Size(20).
-		Do(context.Background())
+		Do(ctx)
 
 	if err != nil {
 		zap.L().Error("get book press error", zap.Error(err))
@@ -93,9 +93,9 @@ func (s *BookService) GetPress() []interface{} {
 	return s.Rep.Fields2Slice(res, constants.BookPress)
 }
 
-func (s *BookService) GraphSearch() interface{} {
+func (s *BookService) GraphSearch(ctx context.Context) interface{} {
 	param := graphql.Params{
-		Schema:        s.GraphSchema(),
+		Schema:        s.GraphSchema(ctx),
 		RequestString: constants.BookRequest,
 	}
 
@@ -108,9 +108,9 @@ func (s *BookService) GraphSearch() interface{} {
 	return result
 }
 
-func (s *BookService) GraphSchema() graphql.Schema {
+func (s *BookService) GraphSchema(ctx context.Context) graphql.Schema {
 	schema, err := graphql.NewSchema(graphql.SchemaConfig{
-		Query: s.graphQuery(),
+		Query: s.graphQuery(ctx),
 	})
 
 	if err != nil {
@@ -120,7 +120,7 @@ func (s *BookService) GraphSchema() graphql.Schema {
 	return schema
 }
 
-func (s *BookService) graphQuery() *graphql.Object {
+func (s *BookService) graphQuery(ctx context.Context) *graphql.Object {
 	return graphql.NewObject(graphql.ObjectConfig{
 		Name: "BookQuery",
 		Fields: graphql.Fields{
@@ -150,7 +150,7 @@ func (s *BookService) graphQuery() *graphql.Object {
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if result, err := s.Es.Search().Index(constants.BookIndex).
 						Query(s.Req.WildcardName(p.Args["name"].(string))).
-						Do(context.Background()); err != nil {
+						Do(ctx); err != nil {
 						return nil, err
 					} else {
 						return s.Rep.Result2Books(result), nil
@@ -162,8 +162,8 @@ func (s *BookService) graphQuery() *graphql.Object {
 }
 
 // GetByID 详情
-func (s *BookService) GetByID(id string) interface{} {
-	if res, err := s.Es.Get().Index(constants.BookIndex).Id(id).Do(context.Background()); err != nil {
+func (s *BookService) GetByID(ctx context.Context, id string) interface{} {
+	if res, err := s.Es.Get().Index(constants.BookIndex).Id(id).Do(ctx); err != nil {
 		zap.L().Warn("not found", zap.Error(err), zap.String("id", id))
 		return nil
 	} else {
@@ -172,7 +172,7 @@ func (s *BookService) GetByID(id string) interface{} {
 }
 
 // Create 创建
-func (s *BookService) Create(param *dto.BookStoreParam) error {
+func (s *BookService) Create(ctx context.Context, param *dto.BookStoreParam) error {
 	b := s.Req.StoreParam2Book(param)
 	if err := g.NewBookRepo(s.DB).Create(b); err != nil {
 		zap.L().Error("create book", zap.Error(err), zap.Any("book", b))
@@ -181,7 +181,7 @@ func (s *BookService) Create(param *dto.BookStoreParam) error {
 
 	if _, err := s.Es.Index().Index(constants.BookIndex).
 		Id(strconv.Itoa(b.ID)).BodyJson(b).
-		Do(context.Background()); err != nil {
+		Do(ctx); err != nil {
 		zap.L().Error("create book", zap.Error(err))
 	}
 
@@ -189,7 +189,7 @@ func (s *BookService) Create(param *dto.BookStoreParam) error {
 }
 
 // Update 更新
-func (s *BookService) Update(request *dto.BookUrlRequest, param *dto.BookStoreParam) error {
+func (s *BookService) Update(ctx context.Context, request *dto.BookUrlRequest, param *dto.BookStoreParam) error {
 	b := s.Req.StoreParam2Book(param, request)
 	if err := g.NewBookRepo(s.DB).Update(b); err != nil {
 		zap.L().Error("update book", zap.Error(err), zap.Any("book", b))
@@ -198,7 +198,7 @@ func (s *BookService) Update(request *dto.BookUrlRequest, param *dto.BookStorePa
 
 	if _, err := s.Es.Update().Index(constants.BookIndex).
 		Id(strconv.Itoa(b.ID)).Doc(b).Refresh("true").
-		Do(context.Background()); err != nil {
+		Do(ctx); err != nil {
 		zap.L().Error("update book", zap.Error(err))
 	}
 
@@ -206,13 +206,13 @@ func (s *BookService) Update(request *dto.BookUrlRequest, param *dto.BookStorePa
 }
 
 // Delete 删除
-func (s *BookService) Delete(request *dto.BookUrlRequest) error {
+func (s *BookService) Delete(ctx context.Context, request *dto.BookUrlRequest) error {
 	if err := g.NewBookRepo(s.DB).Delete(request.ID); err != nil {
 		zap.L().Error("delete book", zap.Error(err), zap.Any("id", request.ID))
 		return fmt.Errorf("删除失败")
 	}
 
-	if _, err := s.Es.Delete().Index(constants.BookIndex).Id(strconv.Itoa(request.ID)).Refresh("true").Do(context.Background()); err != nil {
+	if _, err := s.Es.Delete().Index(constants.BookIndex).Id(strconv.Itoa(request.ID)).Refresh("true").Do(ctx); err != nil {
 		zap.L().Error("delete book", zap.Error(err), zap.Any("id", request.ID))
 		return fmt.Errorf("删除失败")
 	}

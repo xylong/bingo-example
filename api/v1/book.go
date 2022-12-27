@@ -21,11 +21,11 @@ func NewBookController() *BookController {
 }
 
 func (c *BookController) import2es(ctx *bingo.Context) {
-	c.Service.BatchImport()
+	c.Service.BatchImport(ctx)
 }
 
 func (c *BookController) index(ctx *bingo.Context) {
-	schema := c.Service.GraphSchema()
+	schema := c.Service.GraphSchema(ctx)
 
 	handler.New(&handler.Config{
 		Schema: &schema,
@@ -33,17 +33,15 @@ func (c *BookController) index(ctx *bingo.Context) {
 }
 
 func (c *BookController) show(ctx *bingo.Context) interface{} {
-	return c.Service.GetByID(ctx.Param("id"))
+	return c.Service.GetByID(ctx, ctx.Param("id"))
 }
 
 func (c *BookController) search(ctx *bingo.Context) interface{} {
-	return c.Service.Search(
-		ctx.Binding(ctx.ShouldBind, &dto.BookSearchParam{}).
-			Unwrap().(*dto.BookSearchParam))
+	return c.Service.Search(ctx, ctx.Binding(ctx.ShouldBind, &dto.BookSearchParam{}).Unwrap().(*dto.BookSearchParam))
 }
 
 func (c *BookController) press(ctx *bingo.Context) interface{} {
-	return c.Service.GetPress()
+	return c.Service.GetPress(ctx)
 }
 
 func (c *BookController) create(ctx *bingo.Context) interface{} {
@@ -52,7 +50,7 @@ func (c *BookController) create(ctx *bingo.Context) interface{} {
 		return gin.H{"msg": err.Error()}
 	}
 
-	return c.Service.Create(param)
+	return c.Service.Create(ctx, param)
 }
 
 func (c *BookController) update(ctx *bingo.Context) interface{} {
@@ -66,15 +64,11 @@ func (c *BookController) update(ctx *bingo.Context) interface{} {
 		return gin.H{"msg": err.Error()}
 	}
 
-	return c.Service.Update(url, param)
+	return c.Service.Update(ctx, url, param)
 }
 
 func (c *BookController) delete(ctx *bingo.Context) interface{} {
-	err := c.Service.Delete(
-		ctx.Binding(ctx.ShouldBindUri, &dto.BookUrlRequest{}).
-			Unwrap().(*dto.BookUrlRequest))
-
-	if err != nil {
+	if err := c.Service.Delete(ctx, ctx.Binding(ctx.ShouldBindUri, &dto.BookUrlRequest{}).Unwrap().(*dto.BookUrlRequest)); err != nil {
 		return gin.H{"code": 10000, "msg": err.Error(), "data": nil}
 	}
 
