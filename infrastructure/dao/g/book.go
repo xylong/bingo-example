@@ -32,3 +32,7 @@ func (r *BookRepo) Create(book *Book) error {
 func (r *BookRepo) Update(book *Book) error {
 	return r.db.Updates(book).Error
 }
+
+func (r *BookRepo) Delete(id int) error {
+	return r.db.Delete(&Book{}, id).Error
+}

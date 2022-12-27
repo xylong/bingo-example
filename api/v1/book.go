@@ -69,6 +69,18 @@ func (c *BookController) update(ctx *bingo.Context) interface{} {
 	return c.Service.Update(url, param)
 }
 
+func (c *BookController) delete(ctx *bingo.Context) interface{} {
+	err := c.Service.Delete(
+		ctx.Binding(ctx.ShouldBindUri, &dto.BookUrlRequest{}).
+			Unwrap().(*dto.BookUrlRequest))
+
+	if err != nil {
+		return gin.H{"code": 10000, "msg": err.Error(), "data": nil}
+	}
+
+	return gin.H{"code": 0, "msg": "", "data": nil}
+}
+
 func (c *BookController) Name() string {
 	return "BookController"
 }
@@ -81,4 +93,5 @@ func (c *BookController) Route(group *bingo.Group) {
 	group.POST("book", c.index)
 	group.POST("books", c.create)
 	group.PUT("books/:id", c.update)
+	group.DELETE("books/:id", c.delete)
 }

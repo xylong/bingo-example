@@ -2,6 +2,7 @@ package book
 
 import (
 	"github.com/graphql-go/graphql"
+	"gorm.io/gorm"
 )
 
 const (
@@ -23,6 +24,7 @@ type Book struct {
 	Date    string  `gorm:"column:date;type:char(11)" json:"date"`               // 出版时间
 	Kind    uint8   `gorm:"column:kind;type:int" json:"kind"`                    // 分类id
 	KindStr string  `gorm:"column:kind_str;type:varchar(15)" json:"kind_str"`    // 分类名
+	gorm.DeletedAt
 }
 
 func New(attributes ...Attribute) *Book {

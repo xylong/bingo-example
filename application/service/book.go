@@ -17,6 +17,7 @@ import (
 	"sync"
 )
 
+// BookService 📚
 type BookService struct {
 	Req *assembler.BookReq `inject:"-"`
 	Rep *assembler.BookRep `inject:"-"`
@@ -63,7 +64,7 @@ func (s *BookService) BatchImport() {
 	wg.Wait()
 }
 
-// Search 📚搜索
+// Search 搜索
 func (s *BookService) Search(param *dto.BookSearchParam) interface{} {
 	result, err := s.Es.Search().Index(constants.BookIndex).
 		Query(s.Req.Filter(param)).SortBy(s.Req.Sort(param.Sorts)...).
@@ -199,6 +200,21 @@ func (s *BookService) Update(request *dto.BookUrlRequest, param *dto.BookStorePa
 		Id(strconv.Itoa(b.ID)).Doc(b).Refresh("true").
 		Do(context.Background()); err != nil {
 		zap.L().Error("update book", zap.Error(err))
+	}
+
+	return nil
+}
+
+// Delete 删除
+func (s *BookService) Delete(request *dto.BookUrlRequest) error {
+	if err := g.NewBookRepo(s.DB).Delete(request.ID); err != nil {
+		zap.L().Error("delete book", zap.Error(err), zap.Any("id", request.ID))
+		return fmt.Errorf("删除失败")
+	}
+
+	if _, err := s.Es.Delete().Index(constants.BookIndex).Id(strconv.Itoa(request.ID)).Refresh("true").Do(context.Background()); err != nil {
+		zap.L().Error("delete book", zap.Error(err), zap.Any("id", request.ID))
+		return fmt.Errorf("删除失败")
 	}
 
 	return nil
