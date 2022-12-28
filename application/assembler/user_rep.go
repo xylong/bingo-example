@@ -32,3 +32,25 @@ func (r *UserRep) User2Profile(user *user.User) *dto.Profile {
 		CreatedAt: user.CreatedAt.Format("2006-01-02 15:04:05"),
 	}
 }
+
+func (r *UserRep) SimpleList(users []*user.User) []*dto.SimpleUser {
+	if users == nil || len(users) == 0 {
+		return nil
+	}
+
+	var list []*dto.SimpleUser
+	for _, u := range users {
+		list = append(list, &dto.SimpleUser{
+			ID:     u.ID,
+			Avatar: u.Avatar,
+			Phone:  u.Phone,
+			Email:  u.Email,
+			//Gender:    u.Profile.Gender,
+			//Level:     u.Profile.Level,
+			Signature: u.Nickname,
+			CreatedAt: u.CreatedAt.Format("2006-01-02 15:04:05"),
+		})
+	}
+
+	return list
+}

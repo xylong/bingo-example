@@ -4,7 +4,7 @@ import (
 	"bingo-example/domain/entity/answer"
 	"bingo-example/domain/entity/question"
 	"bingo-example/domain/repository"
-	"bingo-example/infrastructure/dao/g"
+	"bingo-example/infrastructure/dao"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -31,7 +31,7 @@ func (b *questionBankBuilder) SetAnswer(answers []*answer.Answer) *questionBankB
 
 func (b *questionBankBuilder) SetQuestionRepo(db *gorm.DB) *questionBankBuilder {
 	if db != nil {
-		b.questionRepo = g.NewQuestionRepo(db)
+		b.questionRepo = dao.NewQuestionRepo(db)
 	} else {
 		zap.L().Warn("question repo is nil")
 	}

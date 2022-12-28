@@ -1,10 +1,12 @@
 package aggregate
 
 import (
+	"bingo-example/application/dto"
 	"bingo-example/domain/entity"
 	"bingo-example/domain/entity/profile"
 	"bingo-example/domain/entity/user"
 	"bingo-example/domain/repository"
+	"gorm.io/gorm"
 )
 
 // Member 会员
@@ -39,10 +41,25 @@ func (m *Member) Create() error {
 	return nil
 }
 
-func (m *Member) Get(with ...string) error {
-	return m.UserRepo.Get(m.User, with...)
-}
+// Get 获取用户
+func (m *Member) Get(request *dto.UserRequest) (int64, []*user.User, error) {
+	scopes := []func(db *gorm.DB) *gorm.DB{
+		entity.Paginate(request.Page, request.PageSize),
+	}
 
-func (m *Member) GetMembers() {
+	{
+		if request.Name != "" {
+			scopes = append(scopes, m.User.NickNameCompare(request.Name, entity.Like))
+		}
 
+		if request.Phone != "" {
+			scopes = append(scopes, m.User.PhoneCompare(request.Phone, entity.Equal))
+		}
+
+		if request.Email != "" {
+			scopes = append(scopes, m.User.EmailCompare(request.Email, entity.Equal))
+		}
+	}
+
+	return m.UserRepo.GetCount(scopes...)
 }

@@ -5,7 +5,7 @@ import (
 	"bingo-example/application/dto"
 	"bingo-example/constants"
 	"bingo-example/domain/entity/book"
-	"bingo-example/infrastructure/dao/g"
+	"bingo-example/infrastructure/dao"
 	"context"
 	"fmt"
 	"github.com/graphql-go/graphql"
@@ -134,7 +134,7 @@ func (s *BookService) graphQuery(ctx context.Context) *graphql.Object {
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if v, ok := p.Args["id"]; ok {
 						db := ioc.Factory.Get((*gorm.DB)(nil))
-						return g.NewBookRepo(db.(*gorm.DB)).GetByID(v.(int))
+						return dao.NewBookRepo(db.(*gorm.DB)).GetByID(v.(int))
 					} else {
 						return nil, nil
 					}
@@ -174,7 +174,7 @@ func (s *BookService) GetByID(ctx context.Context, id string) interface{} {
 // Create 创建
 func (s *BookService) Create(ctx context.Context, param *dto.BookStoreParam) error {
 	b := s.Req.StoreParam2Book(param)
-	if err := g.NewBookRepo(s.DB).Create(b); err != nil {
+	if err := dao.NewBookRepo(s.DB).Create(b); err != nil {
 		zap.L().Error("create book", zap.Error(err), zap.Any("book", b))
 		return fmt.Errorf("创建失败")
 	}
@@ -191,7 +191,7 @@ func (s *BookService) Create(ctx context.Context, param *dto.BookStoreParam) err
 // Update 更新
 func (s *BookService) Update(ctx context.Context, request *dto.BookUrlRequest, param *dto.BookStoreParam) error {
 	b := s.Req.StoreParam2Book(param, request)
-	if err := g.NewBookRepo(s.DB).Update(b); err != nil {
+	if err := dao.NewBookRepo(s.DB).Update(b); err != nil {
 		zap.L().Error("update book", zap.Error(err), zap.Any("book", b))
 		return fmt.Errorf("更新失败")
 	}
@@ -207,7 +207,7 @@ func (s *BookService) Update(ctx context.Context, request *dto.BookUrlRequest, p
 
 // Delete 删除
 func (s *BookService) Delete(ctx context.Context, request *dto.BookUrlRequest) error {
-	if err := g.NewBookRepo(s.DB).Delete(request.ID); err != nil {
+	if err := dao.NewBookRepo(s.DB).Delete(request.ID); err != nil {
 		zap.L().Error("delete book", zap.Error(err), zap.Any("id", request.ID))
 		return fmt.Errorf("删除失败")
 	}

@@ -5,7 +5,7 @@ import (
 	"bingo-example/domain/entity/profile"
 	"bingo-example/domain/entity/user"
 	"bingo-example/domain/repository"
-	"bingo-example/infrastructure/dao/g"
+	"bingo-example/infrastructure/dao"
 	"gorm.io/gorm"
 )
 
@@ -37,12 +37,12 @@ func (m *MemberBuilder) SetProfile(profile *profile.Profile) *MemberBuilder {
 }
 
 func (m *MemberBuilder) SetUserRepo(db *gorm.DB) *MemberBuilder {
-	m.userRepo = g.NewUserRepo(db)
+	m.userRepo = dao.NewUserRepo(db)
 	return m
 }
 
 func (m *MemberBuilder) SetProfileRepo(db *gorm.DB) *MemberBuilder {
-	m.profileRepo = g.NewProfileRepo(db)
+	m.profileRepo = dao.NewProfileRepo(db)
 	return m
 }
 

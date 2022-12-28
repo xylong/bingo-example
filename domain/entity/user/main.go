@@ -28,6 +28,45 @@ func New(attr ...entity.Attr) *User {
 	return user
 }
 
+// NickNameCompare 比较名称
+func (u *User) NickNameCompare(name string, operator int) entity.Scope {
+	return func(db *gorm.DB) *gorm.DB {
+		switch operator {
+		case entity.NotEqual:
+			return db.Where("nickname<>?", name)
+		case entity.Like:
+			return db.Where("nickname like ?", "%"+name+"%")
+		case entity.NotLike:
+			return db.Where("nickname not like ?", "%"+name+"%")
+		default:
+			return db.Where("nickname=?", name)
+		}
+	}
+}
+
+// PhoneCompare 比较手机号
+func (u *User) PhoneCompare(phone string, operator int) entity.Scope {
+	return func(db *gorm.DB) *gorm.DB {
+		switch operator {
+		case entity.NotEqual:
+			return db.Where("phone<>?", phone)
+		default:
+			return db.Where("phone=?", phone)
+		}
+	}
+}
+
+func (u *User) EmailCompare(email string, operator int) entity.Scope {
+	return func(db *gorm.DB) *gorm.DB {
+		switch operator {
+		case entity.NotEqual:
+			return db.Where("email<>?", email)
+		default:
+			return db.Where("email=?", email)
+		}
+	}
+}
+
 func WithID(id int) entity.Attr {
 	return func(i interface{}) {
 		if id > 0 {

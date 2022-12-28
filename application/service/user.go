@@ -5,6 +5,7 @@ import (
 	"bingo-example/application/dto"
 	"bingo-example/domain/aggregate"
 	"bingo-example/domain/entity/user"
+	"context"
 	"gorm.io/gorm"
 )
 
@@ -43,11 +44,12 @@ func (s *UserService) Register(param *dto.RegisterParam) (int, string, string) {
 	return 0, "", token
 }
 
+// Login 登录
 func (s *UserService) Login(param *dto.LoginParam) (int, string, string) {
 	member := new(aggregate.Member).Builder(s.Req.Login2User(param)).SetUserRepo(s.DB).Build()
-	if err := member.Get("Profile"); err != nil {
-		return 1002, err.Error(), ""
-	}
+	//if err := member.Get("Profile"); err != nil {
+	//	return 1002, err.Error(), ""
+	//}
 
 	if !member.User.Profile.VerifyPassword(param.Password) {
 		return 1002, "账号或密码错误", ""
@@ -64,9 +66,19 @@ func (s *UserService) Login(param *dto.LoginParam) (int, string, string) {
 // Profile 个人信息
 func (s *UserService) Profile(id int) (int, string, *dto.Profile) {
 	u := user.New(user.WithID(id))
-	if err := new(aggregate.Member).Builder(u).SetUserRepo(s.DB).Build().Get("Profile"); err != nil {
-		return 1002, "not found", nil
-	}
+	//if err := new(aggregate.Member).Builder(u).SetUserRepo(s.DB).Build().Get("Profile"); err != nil {
+	//	return 1002, "not found", nil
+	//}
 
 	return 0, "", s.Rep.User2Profile(u)
+}
+
+// Get 获取用户
+func (s *UserService) Get(ctx context.Context, request *dto.UserRequest) (int64, []*dto.SimpleUser, error) {
+	total, users, err := new(aggregate.Member).Builder(user.New()).SetUserRepo(s.DB).Build().Get(request)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	return total, s.Rep.SimpleList(users), nil
 }

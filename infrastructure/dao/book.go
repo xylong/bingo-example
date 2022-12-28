@@ -1,4 +1,4 @@
-package g
+package dao
 
 import (
 	. "bingo-example/domain/entity/book"

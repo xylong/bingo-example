@@ -17,7 +17,7 @@ type Profile struct {
 	Salt      string    `gorm:"type:char(6);comment:盐" json:"salt"`
 	Birthday  time.Time `gorm:"type:date;default:null;comment:出生日期" json:"birthday"`
 	Gender    int8      `gorm:"type:tinyint(1);default:-1;comment:-1保密 0女 1男" json:"gender"`
-	Level     int8      `gorm:"type:tinyint(1);default:0;comment:等级" json:"level"`
+	Level     uint8     `gorm:"type:tinyint(1);default:0;comment:等级" json:"level"`
 	Signature string    `gorm:"type:varchar(255);comment=个性签名" json:"signature"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
