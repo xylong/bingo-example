@@ -55,7 +55,9 @@ func (c *UserCtrl) me(ctx *bingo.Context) (int, string, interface{}) {
 }
 
 func (c *UserCtrl) countRegister(ctx *bingo.Context) interface{} {
-	return c.Service.CountReg(ctx)
+	return c.Service.CountReg(ctx,
+		ctx.Binding(ctx.ShouldBind, &dto.RegisterCountRequest{}).
+			Unwrap().(*dto.RegisterCountRequest))
 }
 
 func (c *UserCtrl) Route(group *bingo.Group) {

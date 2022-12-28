@@ -17,5 +17,5 @@ type IUserRepo interface {
 	GetCount(...func(db *gorm.DB) *gorm.DB) (int64, []*user.User, error)
 
 	// CountRegister 统计最近注册人数
-	CountRegister(interface{}) (interface{}, error)
+	CountRegister(interface{}, string) (interface{}, error)
 }

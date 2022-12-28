@@ -11,6 +11,11 @@ type (
 		Gender   int8   `form:"gender" json:"gender" binding:"omitempty,oneof=-1 0 1"`      // 性别
 		Level    uint8  `form:"level" json:"level" binding:"omitempty,oneof=0 1 2 3 4 5 6"` // 等级
 	}
+
+	// RegisterCountRequest 注册统计
+	RegisterCountRequest struct {
+		Month string `form:"month" json:"month"`
+	}
 )
 
 type (
@@ -45,5 +50,11 @@ type (
 		Level     uint8  `json:"level"`
 		Signature string `json:"signature"`
 		CreatedAt string `json:"created_at"`
+	}
+
+	// RegisterCount 注册统计
+	RegisterCount struct {
+		Date  string `json:"date"`
+		Total int64  `json:"total"`
 	}
 )

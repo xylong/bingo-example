@@ -35,10 +35,10 @@ func (r *UserRepo) GetCount(scopes ...func(db *gorm.DB) *gorm.DB) (total int64, 
 }
 
 // CountRegister 统计注册数
-func (r *UserRepo) CountRegister(result interface{}) (interface{}, error) {
+func (r *UserRepo) CountRegister(result interface{}, month string) (interface{}, error) {
 	err := r.db.Model(user.New()).
 		Select("date(created_at) as date, count(*) as total").
-		Group("date").Having("total > ?", 0).
+		Group("date").Where("created_at like ?", month+"%").
 		Scan(&result).Error
 
 	return result, err

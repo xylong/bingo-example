@@ -9,7 +9,6 @@ import (
 	"context"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"time"
 )
 
 // UserService 用户服务
@@ -89,13 +88,14 @@ func (s *UserService) Get(ctx context.Context, request *dto.UserRequest) (*dto.S
 	}, nil
 }
 
-func (s *UserService) CountReg(ctx context.Context) interface{} {
-	result, err := dao.NewUserRepo(s.DB).CountRegister([]*struct {
-		Date  time.Time `json:"date"`
-		Total int64     `json:"total"`
-	}{})
+func (s *UserService) CountReg(ctx context.Context, request *dto.RegisterCountRequest) interface{} {
+	result, err := dao.NewUserRepo(s.DB).CountRegister([]*dto.RegisterCount{}, request.Month)
 	if err != nil {
 		zap.L().Error("count", zap.Error(err))
+	}
+
+	for _, item := range result.([]*dto.RegisterCount) {
+		item.Date = item.Date[:10]
 	}
 
 	return result
