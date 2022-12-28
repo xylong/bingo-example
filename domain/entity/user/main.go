@@ -22,9 +22,9 @@ type User struct {
 	Profile *profile.Profile
 }
 
-func New(attr ...entity.Attr) *User {
+func New(attr ...Attr) *User {
 	user := &User{ThirdParty: NewThirdParty(), Info: NewInfo()}
-	entity.Attrs(attr).Apply(user)
+	Attrs(attr).Apply(user)
 	return user
 }
 
@@ -63,22 +63,6 @@ func (u *User) EmailCompare(email string, operator int) entity.Scope {
 			return db.Where("email<>?", email)
 		default:
 			return db.Where("email=?", email)
-		}
-	}
-}
-
-func WithID(id int) entity.Attr {
-	return func(i interface{}) {
-		if id > 0 {
-			i.(*User).ID = id
-		}
-	}
-}
-
-func WithPhone(phone string) entity.Attr {
-	return func(i interface{}) {
-		if phone != "" {
-			i.(*User).Phone = phone
 		}
 	}
 }

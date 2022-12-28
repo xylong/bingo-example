@@ -77,13 +77,16 @@ func (s *UserService) Profile(id int) (int, string, *dto.Profile) {
 }
 
 // Get 获取用户
-func (s *UserService) Get(ctx context.Context, request *dto.UserRequest) (int64, []*dto.SimpleUser, error) {
+func (s *UserService) Get(ctx context.Context, request *dto.UserRequest) (*dto.SimpleUserList, error) {
 	total, users, err := new(aggregate.Member).Builder(user.New()).SetUserRepo(s.DB).Build().Get(request)
 	if err != nil {
-		return 0, nil, err
+		return nil, err
 	}
 
-	return total, s.Rep.SimpleList(users), nil
+	return &dto.SimpleUserList{
+		Total: total,
+		List:  s.Rep.SimpleList(users),
+	}, nil
 }
 
 func (s *UserService) CountReg(ctx context.Context) interface{} {

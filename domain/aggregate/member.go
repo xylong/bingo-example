@@ -5,6 +5,7 @@ import (
 	"bingo-example/domain/entity"
 	"bingo-example/domain/entity/profile"
 	"bingo-example/domain/entity/user"
+	"bingo-example/domain/entity/userlog"
 	"bingo-example/domain/repository"
 	"gorm.io/gorm"
 )
@@ -18,7 +19,7 @@ type Member struct {
 	Profile *profile.Profile
 
 	// Logs 登录日志
-	Logs []*entity.LoginLog
+	Logs []*userlog.UserLog
 
 	UserRepo    repository.IUserRepo
 	ProfileRepo repository.IProfileRepo
@@ -44,12 +45,14 @@ func (m *Member) Create() error {
 // Get 获取用户
 func (m *Member) Get(request *dto.UserRequest) (int64, []*user.User, error) {
 	scopes := []func(db *gorm.DB) *gorm.DB{
+		entity.Select("id", "nickname", "avatar", "phone", "email", "created_at"),
 		entity.Paginate(request.Page, request.PageSize),
+		entity.Order("id desc"),
 	}
 
 	{
-		if request.Name != "" {
-			scopes = append(scopes, m.User.NickNameCompare(request.Name, entity.Like))
+		if request.Nickname != "" {
+			scopes = append(scopes, m.User.NickNameCompare(request.Nickname, entity.Like))
 		}
 
 		if request.Phone != "" {

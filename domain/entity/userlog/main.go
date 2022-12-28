@@ -1,4 +1,4 @@
-package entity
+package userlog
 
 const (
 	Login  = 1 // 登录
@@ -8,8 +8,8 @@ const (
 	SucceedLog = 1 // 成功
 )
 
-// LoginLog 登录日志
-type LoginLog struct {
+// UserLog 用户日志
+type UserLog struct {
 	UserID    int    `bson:"user_id" json:"user_id"` // 用户🆔
 	IP        string `bson:"ip" json:"ip"`           // ip地址
 	Type      uint8  `bson:"type"`                   // 1登录 2登出
@@ -17,8 +17,8 @@ type LoginLog struct {
 	CreatedAt string `bson:"created_at"`             // 创建时间
 }
 
-func NewLoginLog(attr ...Attr) *LoginLog {
-	log := &LoginLog{}
+func NewUserLog(attr ...Attr) *UserLog {
+	log := &UserLog{}
 	Attrs(attr).Apply(log)
 	return log
 }

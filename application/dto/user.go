@@ -4,7 +4,7 @@ type (
 	// UserRequest 用户查询请求
 	UserRequest struct {
 		*Pagination
-		Name     string `form:"name" json:"name" binding:"omitempty"`
+		Nickname string `form:"nickname" json:"nickname" binding:"omitempty"`
 		Phone    string `form:"phone" json:"phone" binding:"omitempty,phone"`
 		Email    string `form:"email" json:"email" binding:"omitempty,email"`
 		Birthday string `form:"birthday" json:"birthday" binding:"omitempty,date"`          // 生日
@@ -14,9 +14,16 @@ type (
 )
 
 type (
-	// SimpleUser 简单用户列表
+	// SimpleUserList 简单用户列表
+	SimpleUserList struct {
+		Total int64         `json:"total"`
+		List  []*SimpleUser `json:"list"`
+	}
+
+	// SimpleUser 简洁用户信息
 	SimpleUser struct {
 		ID        int    `json:"id"`
+		Nickname  string `json:"nickname"`
 		Avatar    string `json:"avatar"`
 		Phone     string `json:"phone"`
 		Email     string `json:"email"`

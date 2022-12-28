@@ -1,9 +1,9 @@
 package aggregate
 
 import (
-	"bingo-example/domain/entity"
 	"bingo-example/domain/entity/profile"
 	"bingo-example/domain/entity/user"
+	"bingo-example/domain/entity/userlog"
 	"bingo-example/domain/repository"
 	"bingo-example/infrastructure/dao"
 	"gorm.io/gorm"
@@ -14,13 +14,13 @@ import (
 type MemberBuilder struct {
 	user    *user.User
 	profile *profile.Profile
-	logs    []*entity.LoginLog
+	logs    []*userlog.UserLog
 
 	userRepo    repository.IUserRepo
 	profileRepo repository.IProfileRepo
 }
 
-func (m *MemberBuilder) SetLogs(logs []*entity.LoginLog) *MemberBuilder {
+func (m *MemberBuilder) SetLogs(logs []*userlog.UserLog) *MemberBuilder {
 	if logs != nil {
 		m.logs = logs
 	}

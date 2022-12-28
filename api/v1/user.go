@@ -31,10 +31,10 @@ func (c *UserCtrl) index(ctx *bingo.Context) interface{} {
 		return err.Error()
 	}
 
-	if total, users, err := c.Service.Get(ctx, req); err != nil {
+	if result, err := c.Service.Get(ctx, req); err != nil {
 		return err.Error()
 	} else {
-		return gin.H{"total": total, "list": users}
+		return gin.H{"code": 0, "msg": "", "data": result}
 	}
 }
 

@@ -1,7 +1,6 @@
 package profile
 
 import (
-	"bingo-example/domain/entity"
 	"bingo-example/infrastructure/util"
 	"errors"
 	"golang.org/x/crypto/bcrypt"
@@ -23,9 +22,9 @@ type Profile struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func New(attr ...entity.Attr) *Profile {
+func New(attr ...Attr) *Profile {
 	p := &Profile{}
-	entity.Attrs(attr).Apply(p)
+	Attrs(attr).Apply(p)
 	return p
 }
 
@@ -52,12 +51,4 @@ func (p *Profile) Birth() string {
 // VerifyPassword 校验密码
 func (p *Profile) VerifyPassword(password string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(p.Password), []byte(util.Md5(password)+p.Salt)) == nil
-}
-
-func WithPassword(password string) entity.Attr {
-	return func(i interface{}) {
-		if password != "" {
-			i.(*Profile).Password = password
-		}
-	}
 }
