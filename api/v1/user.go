@@ -54,10 +54,15 @@ func (c *UserCtrl) me(ctx *bingo.Context) (int, string, interface{}) {
 	return c.Service.Profile(ctx.GetInt("user_id"))
 }
 
+func (c *UserCtrl) countRegister(ctx *bingo.Context) interface{} {
+	return c.Service.CountReg(ctx)
+}
+
 func (c *UserCtrl) Route(group *bingo.Group) {
 	group.GET("users", c.index)
 	group.POST("register", c.register)
 	group.POST("login", c.login)
+	group.GET("reg-count", c.countRegister)
 
 	group.Group("", func(group *bingo.Group) {
 		group.GET("me", c.me)

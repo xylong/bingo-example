@@ -5,8 +5,11 @@ import (
 	"bingo-example/application/dto"
 	"bingo-example/domain/aggregate"
 	"bingo-example/domain/entity/user"
+	"bingo-example/infrastructure/dao"
 	"context"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
+	"time"
 )
 
 // UserService 用户服务
@@ -81,4 +84,16 @@ func (s *UserService) Get(ctx context.Context, request *dto.UserRequest) (int64,
 	}
 
 	return total, s.Rep.SimpleList(users), nil
+}
+
+func (s *UserService) CountReg(ctx context.Context) interface{} {
+	result, err := dao.NewUserRepo(s.DB).CountRegister([]*struct {
+		Date  time.Time `json:"date"`
+		Total int64     `json:"total"`
+	}{})
+	if err != nil {
+		zap.L().Error("count", zap.Error(err))
+	}
+
+	return result
 }
