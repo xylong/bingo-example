@@ -6,7 +6,9 @@ import (
 	"reflect"
 )
 
-type BookRep struct{}
+type BookRep struct {
+	*ApiResponse
+}
 
 // Result2Slice elastic结果转为slice
 func (r *BookRep) Result2Slice(result *elastic.SearchResult) []*Book {

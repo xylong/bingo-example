@@ -29,7 +29,9 @@ var (
 	}
 )
 
-type BookReq struct{}
+type BookReq struct {
+	*ApiRequest
+}
 
 // Filter 过滤
 func (r *BookReq) Filter(param *dto.BookSearchParam) *elastic.BoolQuery {

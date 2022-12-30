@@ -65,8 +65,12 @@ func (s *BookService) BatchImport(ctx context.Context) {
 }
 
 // Search 搜索
-func (s *BookService) Search(ctx context.Context, param *dto.BookSearchParam) interface{} {
+func (s *BookService) Search(ctx context.Context, param *dto.BookSearchParam) *dto.CountList {
+	// 指定字段
+	var fields = []string{"id", "name", "author", "press", "date", "price1", "price2"}
+
 	result, err := s.Es.Search().Index(constants.BookIndex).
+		FetchSourceContext(elastic.NewFetchSourceContext(true).Include(fields...)).
 		Query(s.Req.Filter(param)).SortBy(s.Req.Sort(param.Sorts)...).
 		From(param.Offset()).Size(param.PageSize).
 		Do(ctx)
@@ -76,7 +80,7 @@ func (s *BookService) Search(ctx context.Context, param *dto.BookSearchParam) in
 		return nil
 	}
 
-	return s.Rep.Result2Slice(result)
+	return s.Rep.EsSearchResult2CountList(result)
 }
 
 // GetPress 获取出版社

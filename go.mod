@@ -10,9 +10,10 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/gorilla/websocket v1.5.0
 	github.com/graphql-go/graphql v0.8.0
+	github.com/graphql-go/handler v0.2.3
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/spf13/viper v1.12.0
-	github.com/xylong/bingo v0.2.3
+	github.com/xylong/bingo v0.2.6
 	go.mongodb.org/mongo-driver v1.10.1
 	go.uber.org/zap v1.23.0
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
@@ -29,11 +30,9 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/goccy/go-json v0.9.10 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
-	github.com/graphql-go/handler v0.2.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/jonboulle/clockwork v0.3.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
