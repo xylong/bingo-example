@@ -26,3 +26,14 @@ func (r *FruitRepo) GroupSearch(n uint) []*fruit.Fruit {
 	r.db.Raw(s, sql.Named("n", n)).Scan(&fruits)
 	return fruits
 }
+
+func (r *FruitRepo) GroupSearch2() []*fruit.Fruit {
+	var fruits []*fruit.Fruit
+
+	sortQuery := r.db.Model(&fruit.Fruit{}).Select("type", "name", "view").Order("type").Order("view desc")
+	lineQuery := r.db.Raw("SELECT @num:=0,@g:=''")
+	mainQuery := r.db.Table("(?) as a,(?) as b", sortQuery, lineQuery).Select("type", "name", "view", "IF(@g=type,@num:=@num+1,@num:=1) as num,@g:=type")
+	r.db.Table("(?) as c", mainQuery).Select("type", "name", "view").Where("num<=?", 2).Find(&fruits)
+
+	return fruits
+}
