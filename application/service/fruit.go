@@ -10,6 +10,14 @@ type FruitService struct {
 	DB *gorm.DB `inject:"-"`
 }
 
-func (s *FruitService) Top() []*fruit.Fruit {
-	return dao.NewFruitRepo(s.DB).GroupSearch()
+// Top 取前n条
+func (s *FruitService) Top() map[string][]*fruit.Fruit {
+	result := make(map[string][]*fruit.Fruit)
+
+	fruits := dao.NewFruitRepo(s.DB).GroupSearch(2)
+	for _, f := range fruits {
+		result[f.Type] = append(result[f.Type], f)
+	}
+
+	return result
 }
