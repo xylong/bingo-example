@@ -17,14 +17,19 @@ func (s *Service) Jwt() *service.JwtService {
 	return new(ServiceFactory).Create(Jwt).(*service.JwtService)
 }
 
-// User 创建UserService
+// User 用户
 func (s *Service) User() *service.UserService {
 	return new(ServiceFactory).Create(User).(*service.UserService)
 }
 
-// Book 书
+// Book 📚
 func (s *Service) Book() *service.BookService {
 	return new(ServiceFactory).Create(Book).(*service.BookService)
+}
+
+// Fruit 🍉
+func (s *Service) Fruit() *service.FruitService {
+	return new(ServiceFactory).Create(Fruit).(*service.FruitService)
 }
 
 // Question 题库
