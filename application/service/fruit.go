@@ -14,9 +14,10 @@ type FruitService struct {
 func (s *FruitService) Top() map[string][]*fruit.Fruit {
 	result := make(map[string][]*fruit.Fruit)
 
-	fruits := dao.NewFruitRepo(s.DB).GroupSearch(2)
+	fruits := dao.NewFruitRepo(s.DB).TopViewByType(2)
 	for _, f := range fruits {
 		result[f.Type] = append(result[f.Type], f)
+		f.Type = ""
 	}
 
 	return result

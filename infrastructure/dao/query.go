@@ -1,11 +1,14 @@
 package dao
 
-import "gorm.io/gorm"
+const (
+	asc  = "asc"
+	desc = "desc"
+)
 
-type query struct {
-}
+func sortOrder(ok bool) string {
+	if !ok {
+		return desc
+	}
 
-// lineNumber 构建分组行号
-func (q *query) lineNumber(db *gorm.DB) *gorm.DB {
-	return db.Select("@num:=0,@g:=''")
+	return asc
 }

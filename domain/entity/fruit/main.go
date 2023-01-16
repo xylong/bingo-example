@@ -2,8 +2,8 @@ package fruit
 
 // Fruit 🍉
 type Fruit struct {
-	ID   uint
-	Name string
-	Type string
-	View int64
+	ID   uint   `json:"id,omitempty"`
+	Name string `json:"name"`
+	Type string `json:"type,omitempty"`
+	View int64  `json:"view"`
 }
