@@ -34,6 +34,17 @@ func (r *UserRepo) GetCount(scopes ...func(db *gorm.DB) *gorm.DB) (total int64, 
 	return
 }
 
+// GetOne 获取单个用户
+func (r *UserRepo) GetOne(u *user.User, with map[string]func(db *gorm.DB) *gorm.DB) error {
+	if with != nil {
+		for s, f := range with {
+			r.db = r.db.Preload(s, f)
+		}
+	}
+
+	return r.db.Where(u).First(u).Error
+}
+
 // CountRegister 统计注册数
 func (r *UserRepo) CountRegister(result interface{}, month string) (interface{}, error) {
 	err := r.db.Model(user.New()).

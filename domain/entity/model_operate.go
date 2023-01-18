@@ -56,3 +56,19 @@ func Order(order interface{}) Scope {
 		return db.Order(order)
 	}
 }
+
+// With 关联预加载
+func With(relations map[string][]string) map[string]func(*gorm.DB) *gorm.DB {
+	if relations == nil {
+		return nil
+	}
+
+	with := make(map[string]func(db *gorm.DB) *gorm.DB)
+	for s, strings := range relations {
+		with[s] = func(db *gorm.DB) *gorm.DB {
+			return db.Select(strings)
+		}
+	}
+
+	return with
+}

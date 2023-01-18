@@ -49,9 +49,9 @@ func (s *UserService) Register(param *dto.RegisterParam) (int, string, string) {
 // Login 登录
 func (s *UserService) Login(param *dto.LoginParam) (int, string, string) {
 	member := new(aggregate.Member).Builder(s.Req.Login2User(param)).SetUserRepo(s.DB).Build()
-	//if err := member.Get("Profile"); err != nil {
-	//	return 1002, err.Error(), ""
-	//}
+	if err := member.Take(map[string][]string{"Profile": []string{"user_id", "password", "salt"}}); err != nil {
+		return 1002, err.Error(), ""
+	}
 
 	if !member.User.Profile.VerifyPassword(param.Password) {
 		return 1002, "账号或密码错误", ""
@@ -68,9 +68,10 @@ func (s *UserService) Login(param *dto.LoginParam) (int, string, string) {
 // Profile 个人信息
 func (s *UserService) Profile(id int) (int, string, *dto.Profile) {
 	u := user.New(user.WithID(id))
-	//if err := new(aggregate.Member).Builder(u).SetUserRepo(s.DB).Build().Get("Profile"); err != nil {
-	//	return 1002, "not found", nil
-	//}
+	if err := new(aggregate.Member).Builder(u).SetUserRepo(s.DB).Build().Take(map[string][]string{
+		"Profile": []string{"user_id", "birthday", "gender", "level", "signature"}}); err != nil {
+		return 1002, "not found", nil
+	}
 
 	return 0, "", s.Rep.User2Profile(u)
 }

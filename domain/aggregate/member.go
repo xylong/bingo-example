@@ -42,6 +42,10 @@ func (m *Member) Create() error {
 	return nil
 }
 
+func (m *Member) Take(with map[string][]string) error {
+	return m.UserRepo.GetOne(m.User, entity.With(with))
+}
+
 // Get 获取用户
 func (m *Member) Get(request *dto.UserRequest) (int64, []*user.User, error) {
 	scopes := []func(db *gorm.DB) *gorm.DB{

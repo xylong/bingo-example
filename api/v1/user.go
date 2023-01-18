@@ -2,6 +2,7 @@ package v1
 
 import (
 	"bingo-example/application/dto"
+	"bingo-example/application/middleware"
 	"bingo-example/application/service"
 	"github.com/gin-gonic/gin"
 	"github.com/xylong/bingo"
@@ -67,5 +68,5 @@ func (c *UserCtrl) Route(group *bingo.Group) {
 
 	group.Group("", func(group *bingo.Group) {
 		group.GET("me", c.me)
-	})
+	}, middleware.NewAuthentication())
 }

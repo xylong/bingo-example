@@ -16,6 +16,9 @@ type IUserRepo interface {
 	// GetCount 查询并统计用户数
 	GetCount(...func(db *gorm.DB) *gorm.DB) (int64, []*user.User, error)
 
+	// GetOne 查找单个用户
+	GetOne(*user.User, map[string]func(*gorm.DB) *gorm.DB) error
+
 	// CountRegister 统计最近注册人数
 	CountRegister(interface{}, string) (interface{}, error)
 }

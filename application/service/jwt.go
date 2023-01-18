@@ -10,24 +10,6 @@ import (
 type JwtService struct {
 }
 
-//func (s *JwtService) Login(param *dto.LoginParam) string {
-//	u := user.NewUser(user.WithPhone(param.Phone))
-//	if err := g.NewUserRepo(s.DB).Get(u); err != nil {
-//		return ""
-//	}
-//
-//	if !u.Profile.VerifyPassword(param.Password) {
-//		return ""
-//	}
-//
-//	token, err := s.generateToken(u.ID)
-//	if err != nil {
-//		return ""
-//	}
-//
-//	return token
-//}
-
 // generateToken 生成token
 func (s *JwtService) generateToken(id int) (string, error) {
 	claims := &entity.JwtClaims{

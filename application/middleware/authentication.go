@@ -69,3 +69,7 @@ func (a *Authentication) Before(ctx *bingo.Context) error {
 	ctx.Next()
 	return nil
 }
+
+func (a *Authentication) After(data interface{}) (interface{}, error) {
+	return data, nil
+}
