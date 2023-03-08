@@ -2,6 +2,7 @@ package dao
 
 import (
 	"bingo-example/domain/entity/user"
+	"bingo-example/domain/repository"
 	"gorm.io/gorm"
 )
 
@@ -9,7 +10,7 @@ type UserRepo struct {
 	db *gorm.DB
 }
 
-func NewUserRepo(db *gorm.DB) *UserRepo {
+func NewUserRepo(db *gorm.DB) repository.IUserRepo {
 	return &UserRepo{db: db}
 }
 

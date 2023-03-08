@@ -12,11 +12,6 @@ func NewService() *Service {
 	return &Service{}
 }
 
-// Jwt 创建jwt
-func (s *Service) Jwt() *service.JwtService {
-	return new(ServiceFactory).Create(Jwt).(*service.JwtService)
-}
-
 // User 用户
 func (s *Service) User() *service.UserService {
 	return new(ServiceFactory).Create(User).(*service.UserService)

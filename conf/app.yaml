@@ -34,6 +34,10 @@ mongo:
   database: cqc
 
 elastic:
-  host: 43.136.220.57
+  host: 127.0.0.1
   port: 9200
   sniff: false
+
+jwt:
+  tokenExpire: 120  # token失效时长(分钟)
+  secret: bingo # 签名密钥

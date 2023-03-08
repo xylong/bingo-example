@@ -14,7 +14,6 @@ func init() {
 
 type UserCtrl struct {
 	Service *service.UserService `inject:"-"`
-	Jwt     *service.JwtService  `inject:"-"`
 }
 
 func NewUserCtrl() *UserCtrl {

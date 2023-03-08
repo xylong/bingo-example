@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"bingo-example/application/service"
+	"bingo-example/utils"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -54,7 +54,7 @@ func (a *Authentication) Before(ctx *bingo.Context) error {
 		return nil
 	}
 
-	claims, err := new(service.JwtService).ParseToken(parts[1])
+	claims, err := utils.ParseToken(parts[1])
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,

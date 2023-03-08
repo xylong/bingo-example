@@ -6,6 +6,7 @@ import (
 	"bingo-example/domain/aggregate"
 	"bingo-example/domain/entity/user"
 	"bingo-example/infrastructure/dao"
+	"bingo-example/utils"
 	"context"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -13,8 +14,6 @@ import (
 
 // UserService 用户服务
 type UserService struct {
-	Jwt *JwtService `inject:"-"`
-
 	Req *assembler.UserReq
 	Rep *assembler.UserRep
 
@@ -38,7 +37,7 @@ func (s *UserService) Register(param *dto.RegisterParam) (int, string, string) {
 		tx.Commit()
 	}
 
-	token, err := s.Jwt.generateToken(member.User.ID)
+	token, err := utils.GenerateToken(member.User.ID)
 	if err != nil {
 		return 1001, err.Error(), ""
 	}
@@ -57,7 +56,7 @@ func (s *UserService) Login(param *dto.LoginParam) (int, string, string) {
 		return 1002, "账号或密码错误", ""
 	}
 
-	token, err := s.Jwt.generateToken(member.User.ID)
+	token, err := utils.GenerateToken(member.User.ID)
 	if err != nil {
 		return 1001, err.Error(), ""
 	}
