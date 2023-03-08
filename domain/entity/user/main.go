@@ -19,7 +19,7 @@ type User struct {
 	DeletedAt gorm.DeletedAt `gorm:"index;->:false;" bson:"deleted_at"`
 
 	// 关联
-	Profile *profile.Profile
+	Profile *profile.Profile // has one
 }
 
 func New(attr ...Attr) *User {

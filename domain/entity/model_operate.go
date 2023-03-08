@@ -1,6 +1,8 @@
 package entity
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 const (
 	_            = iota
@@ -58,17 +60,33 @@ func Order(order interface{}) Scope {
 }
 
 // With 关联预加载
-func With(relations map[string][]string) map[string]func(*gorm.DB) *gorm.DB {
+func With(relations map[string][]string) func(*gorm.DB) *gorm.DB {
 	if relations == nil {
 		return nil
 	}
 
-	with := make(map[string]func(db *gorm.DB) *gorm.DB)
-	for s, strings := range relations {
-		with[s] = func(db *gorm.DB) *gorm.DB {
-			return db.Select(strings)
-		}
+	length := len(relations)
+	if length == 0 {
+		return nil
 	}
 
-	return with
+	return func(db *gorm.DB) *gorm.DB {
+		for key, value := range relations {
+			if len(value) == 0 {
+				continue
+			}
+
+			if key == "" {
+				db.Select(value)
+			} else {
+				func(column []string) *gorm.DB {
+					return db.Preload(key, func(db2 *gorm.DB) *gorm.DB {
+						return db2.Select(column)
+					})
+				}(value)
+			}
+		}
+
+		return db
+	}
 }

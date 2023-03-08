@@ -40,16 +40,16 @@ type (
 
 	// Profile 个人信息
 	Profile struct {
-		ID        int    `json:"id"`
-		Nickname  string `json:"nickname"`
-		Avatar    string `json:"avatar"`
-		Phone     string `json:"phone"`
-		Email     string `json:"email"`
-		Birthday  string `json:"birthday"`
-		Gender    string `json:"gender"`
-		Level     uint8  `json:"level"`
-		Signature string `json:"signature"`
-		CreatedAt string `json:"created_at"`
+		ID        int    `json:"id" redis:"id"`
+		Nickname  string `json:"nickname" redis:"nickname"`
+		Avatar    string `json:"avatar" redis:"avatar"`
+		Phone     string `json:"phone" redis:"phone"`
+		Email     string `json:"email" redis:"email"`
+		Birthday  string `json:"birthday" redis:"birthday"`
+		Gender    string `json:"gender" redis:"gender"`
+		Level     uint8  `json:"level" redis:"level"`
+		Signature string `json:"signature" redis:"signature"`
+		CreatedAt string `json:"created_at" redis:"created_at"`
 	}
 
 	// RegisterCount 注册统计

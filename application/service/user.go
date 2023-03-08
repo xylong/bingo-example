@@ -3,13 +3,17 @@ package service
 import (
 	"bingo-example/application/assembler"
 	"bingo-example/application/dto"
+	"bingo-example/constants"
 	"bingo-example/domain/aggregate"
 	"bingo-example/domain/entity/user"
 	"bingo-example/infrastructure/dao"
 	"bingo-example/utils"
 	"context"
+	"fmt"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+	"time"
 )
 
 // UserService 用户服务
@@ -17,7 +21,8 @@ type UserService struct {
 	Req *assembler.UserReq
 	Rep *assembler.UserRep
 
-	DB *gorm.DB `inject:"-"`
+	DB  *gorm.DB      `inject:"-"`
+	Rdb *redis.Client `inject:"-"`
 }
 
 func (s *UserService) Index() string {
@@ -66,13 +71,33 @@ func (s *UserService) Login(param *dto.LoginParam) (int, string, string) {
 
 // Profile 个人信息
 func (s *UserService) Profile(id int) (int, string, *dto.Profile) {
-	u := user.New(user.WithID(id))
-	if err := new(aggregate.Member).Builder(u).SetUserRepo(s.DB).Build().Take(map[string][]string{
-		"Profile": []string{"user_id", "birthday", "gender", "level", "signature"}}); err != nil {
-		return 1002, "not found", nil
+	profile := &dto.Profile{}
+	ctx := context.Background()
+	key := fmt.Sprintf(constants.ProfileCache, id)
+
+	if err := s.Rdb.HGetAll(ctx, key).Scan(profile); err != nil {
+		zap.L().Error("scan profile", zap.Error(err))
 	}
 
-	return 0, "", s.Rep.User2Profile(u)
+	if profile.ID == 0 {
+		u := user.New(user.WithID(id))
+		if err := new(aggregate.Member).Builder(u).SetUserRepo(s.DB).Build().Take(map[string][]string{
+			"":        []string{"id", "phone", "email", "nickname", "avatar", "created_at"},
+			"Profile": []string{"user_id", "birthday", "gender", "level", "signature"}}); err != nil {
+			return 1002, "not found", nil
+		}
+
+		profile = s.Rep.User2Profile(u)
+		if ok, err := s.Rdb.HMSet(ctx, key, s.Rep.User2ProfileMap(u)).Result(); err != nil || !ok {
+			zap.L().Error("cache profile", zap.Error(err))
+		}
+
+		if !s.Rdb.Expire(ctx, key, time.Minute).Val() {
+			zap.L().Warn("profile cache expire")
+		}
+	}
+
+	return 0, "", profile
 }
 
 // Get 获取用户

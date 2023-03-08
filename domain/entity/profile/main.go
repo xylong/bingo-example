@@ -52,3 +52,19 @@ func (p *Profile) Birth() string {
 func (p *Profile) VerifyPassword(password string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(p.Password), []byte(util.Md5(password)+p.Salt)) == nil
 }
+
+// GenderString 中文性别
+func (p *Profile) GenderString() string {
+	var gender string
+
+	switch p.Gender {
+	case 0:
+		gender = "女"
+	case 1:
+		gender = "男"
+	default:
+		gender = "保密"
+	}
+
+	return gender
+}
