@@ -33,3 +33,7 @@ func getExpiryDate(key string, date numericDate) *jwt.NumericDate {
 func getSecret() []byte {
 	return []byte(viper.GetString("jwt.secret"))
 }
+
+func key(token *jwt.Token) (interface{}, error) {
+	return getSecret(), nil
+}

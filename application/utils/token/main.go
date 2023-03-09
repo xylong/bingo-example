@@ -36,13 +36,35 @@ func Generate(id int) (accessToken, refreshToken string, err error) {
 // Parse 解析token
 func Parse(token string) (*constants.UserClaims, error) {
 	claims := &constants.UserClaims{}
-	_token, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		return getSecret(), nil
-	})
+	_token, err := jwt.ParseWithClaims(token, claims, key)
 
-	if err != nil || !_token.Valid {
-		err = fmt.Errorf("invalid token")
+	if err != nil {
+		return nil, err
 	}
 
-	return claims, err
+	if !_token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	return claims, nil
+}
+
+// Refresh 刷新token
+func Refresh(accessToken, refreshToken string) (newAccessToken, newRefreshToken string, err error) {
+	// refreshToken无效直接返回
+	if _, err = jwt.Parse(refreshToken, key); err != nil {
+		return
+	}
+
+	// 从旧accessToken解析出claims
+	claims := &constants.UserClaims{}
+	_, err = jwt.ParseWithClaims(accessToken, claims, key)
+
+	// 如果是正常过期则重新生成
+	v, _ := err.(*jwt.ValidationError)
+	if v.Errors == jwt.ValidationErrorExpired {
+		return Generate(claims.ID)
+	}
+
+	return
 }
