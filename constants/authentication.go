@@ -1,14 +1,26 @@
 package constants
 
-import "github.com/golang-jwt/jwt/v4"
-
-const (
-	// DefaultTokenExpire 默认token有效期
-	DefaultTokenExpire = 60
+import (
+	"github.com/golang-jwt/jwt/v4"
+	"time"
 )
 
-// JwtClaims 定义payload
-type JwtClaims struct {
+const (
+	// ATokenExpired access_token过期时间
+	ATokenExpired = time.Hour
+
+	// RTokenExpired refresh_token过期时间
+	RTokenExpired = time.Hour * 24 * 3
+
+	// EffectTime 默认token有效期
+	EffectTime = 60
+
+	// SessionID 用户会话标识
+	SessionID = "user_id"
+)
+
+// UserClaims 定义payload
+type UserClaims struct {
 	ID int `json:"id"`
 	jwt.RegisteredClaims
 }

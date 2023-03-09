@@ -1,7 +1,8 @@
 package middleware
 
 import (
-	"bingo-example/utils"
+	"bingo-example/application/utils/token"
+	"bingo-example/constants"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -30,8 +31,8 @@ func (a *Authentication) Before(ctx *bingo.Context) error {
 		}
 	}()
 
-	token := ctx.Token()
-	if token == "" {
+	tokenStr := ctx.Token()
+	if tokenStr == "" {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,
 			"message": "access denied",
@@ -42,7 +43,7 @@ func (a *Authentication) Before(ctx *bingo.Context) error {
 		return nil
 	}
 
-	parts := strings.SplitN(token, " ", 2)
+	parts := strings.SplitN(tokenStr, " ", 2)
 	if !(len(parts) == 2 && parts[0] == "Bearer") {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,
@@ -54,7 +55,7 @@ func (a *Authentication) Before(ctx *bingo.Context) error {
 		return nil
 	}
 
-	claims, err := utils.ParseToken(parts[1])
+	claims, err := token.Parse(parts[1])
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,
@@ -65,7 +66,7 @@ func (a *Authentication) Before(ctx *bingo.Context) error {
 		return nil
 	}
 
-	ctx.Set("user_id", claims.ID)
+	ctx.Set(constants.SessionID, claims.ID)
 	ctx.Next()
 	return nil
 }

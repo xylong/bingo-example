@@ -4,6 +4,7 @@ import (
 	"bingo-example/application/dto"
 	"bingo-example/application/middleware"
 	"bingo-example/application/service"
+	"bingo-example/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/xylong/bingo"
 )
@@ -50,7 +51,7 @@ func (c *UserCtrl) login(ctx *bingo.Context) (int, string, interface{}) {
 }
 
 func (c *UserCtrl) me(ctx *bingo.Context) (int, string, interface{}) {
-	return c.Service.Profile(ctx.GetInt("user_id"))
+	return c.Service.Profile(ctx.GetInt(constants.SessionID))
 }
 
 func (c *UserCtrl) countRegister(ctx *bingo.Context) interface{} {

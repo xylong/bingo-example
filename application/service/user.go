@@ -3,7 +3,9 @@ package service
 import (
 	"bingo-example/application/assembler"
 	"bingo-example/application/dto"
+	"bingo-example/application/utils/token"
 	"bingo-example/constants"
+	"bingo-example/constants/errors"
 	"bingo-example/domain/aggregate"
 	"bingo-example/domain/entity/user"
 	"bingo-example/infrastructure/dao"
@@ -51,26 +53,30 @@ func (s *UserService) Register(param *dto.RegisterParam) (int, string, string) {
 }
 
 // Login 登录
-func (s *UserService) Login(param *dto.LoginParam) (int, string, string) {
+func (s *UserService) Login(param *dto.LoginParam) (int, string, map[string]string) {
 	member := new(aggregate.Member).Builder(s.Req.Login2User(param)).SetUserRepo(s.DB).Build()
-	if err := member.Take(map[string][]string{"Profile": []string{"user_id", "password", "salt"}}); err != nil {
-		return 1002, err.Error(), ""
+	if err := member.Take(map[string][]string{"": []string{"id"}, "Profile": []string{"user_id", "password", "salt"}}); err != nil {
+		return errors.PasswordError.Int(), errors.PasswordError.String(), nil
 	}
 
 	if !member.User.Profile.VerifyPassword(param.Password) {
-		return 1002, "账号或密码错误", ""
+		return errors.PasswordError.Int(), errors.PasswordError.String(), nil
 	}
 
-	token, err := utils.GenerateToken(member.User.ID)
+	accessToken, refreshToken, err := token.Generate(member.User.ID)
 	if err != nil {
-		return 1001, err.Error(), ""
+		return errors.Unauthorized.Int(), errors.Unauthorized.String(), nil
 	}
 
-	return 0, "", token
+	return 0, "", map[string]string{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	}
 }
 
 // Profile 个人信息
 func (s *UserService) Profile(id int) (int, string, *dto.Profile) {
+	// 1.从缓存取信息
 	profile := &dto.Profile{}
 	ctx := context.Background()
 	key := fmt.Sprintf(constants.ProfileCache, id)
@@ -79,6 +85,7 @@ func (s *UserService) Profile(id int) (int, string, *dto.Profile) {
 		zap.L().Error("scan profile", zap.Error(err))
 	}
 
+	// 2.缓存没有再从数据库取，取完设置缓存
 	if profile.ID == 0 {
 		u := user.New(user.WithID(id))
 		if err := new(aggregate.Member).Builder(u).SetUserRepo(s.DB).Build().Take(map[string][]string{

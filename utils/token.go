@@ -13,7 +13,7 @@ func GenerateToken(id int) (string, error) {
 	expiration := getExpire()
 	now := time.Now()
 
-	claims := &constants.JwtClaims{
+	claims := &constants.UserClaims{
 		ID: id,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(now.Add(expiration * time.Minute)),
@@ -27,8 +27,8 @@ func GenerateToken(id int) (string, error) {
 }
 
 // ParseToken 解析token
-func ParseToken(token string) (*constants.JwtClaims, error) {
-	claims := &constants.JwtClaims{}
+func ParseToken(token string) (*constants.UserClaims, error) {
+	claims := &constants.UserClaims{}
 	_token, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return getSecret(), nil
 	})
@@ -49,7 +49,7 @@ func getSecret() []byte {
 func getExpire() time.Duration {
 	expiration := viper.GetDuration("jwt.tokenExpire")
 	if expiration == 0 {
-		expiration = constants.DefaultTokenExpire
+		expiration = constants.EffectTime
 	}
 
 	return expiration
