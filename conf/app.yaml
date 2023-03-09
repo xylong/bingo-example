@@ -39,5 +39,6 @@ elastic:
   sniff: false
 
 jwt:
-  tokenExpire: 120  # token失效时长(分钟)
+  accessExpire: 120  # access_token失效时长(分钟)
+  refreshExpire: 10080 # refresh_token失效时长(分钟)
   secret: bingo # 签名密钥

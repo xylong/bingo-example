@@ -9,11 +9,14 @@ const (
 	// ATokenExpired access_token过期时间
 	ATokenExpired = time.Hour
 
+	// ATokenExpireKey access_token配置名
+	ATokenExpireKey = "jwt.accessExpire"
+
 	// RTokenExpired refresh_token过期时间
 	RTokenExpired = time.Hour * 24 * 3
 
-	// EffectTime 默认token有效期
-	EffectTime = 60
+	// RTokenExpiredKey refresh_token配置名
+	RTokenExpiredKey = "jwt.refreshExpire"
 
 	// SessionID 用户会话标识
 	SessionID = "user_id"

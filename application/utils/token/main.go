@@ -14,7 +14,7 @@ func Generate(id int) (accessToken, refreshToken string, err error) {
 	secret := getSecret()
 
 	rc := jwt.RegisteredClaims{
-		ExpiresAt: getJWTTime(constants.ATokenExpired),
+		ExpiresAt: getExpiryDate(constants.ATokenExpireKey, getJWTTime),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	}
 
@@ -27,7 +27,7 @@ func Generate(id int) (accessToken, refreshToken string, err error) {
 		return
 	}
 
-	rc.ExpiresAt = getJWTTime(constants.RTokenExpired)
+	rc.ExpiresAt = getExpiryDate(constants.RTokenExpiredKey, getJWTTime)
 	refreshToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, rc).SignedString(secret)
 
 	return

@@ -9,7 +9,6 @@ import (
 	"bingo-example/domain/aggregate"
 	"bingo-example/domain/entity/user"
 	"bingo-example/infrastructure/dao"
-	"bingo-example/utils"
 	"context"
 	"fmt"
 	"github.com/redis/go-redis/v9"
@@ -32,24 +31,27 @@ func (s *UserService) Index() string {
 }
 
 // Register 注册
-func (s *UserService) Register(param *dto.RegisterParam) (int, string, string) {
+func (s *UserService) Register(param *dto.RegisterParam) (int, string, map[string]string) {
 	tx := s.DB.Begin()
 
 	member := new(aggregate.Member).Builder(s.Req.Register2User(param)).
 		SetProfile(s.Req.Register2Profile(param)).SetUserRepo(tx).SetProfileRepo(tx).Build()
 	if err := member.Create(); err != nil {
 		tx.Rollback()
-		return 1001, err.Error(), ""
+		return 1001, err.Error(), nil
 	} else {
 		tx.Commit()
 	}
 
-	token, err := utils.GenerateToken(member.User.ID)
+	accessToken, refreshToken, err := token.Generate(member.User.ID)
 	if err != nil {
-		return 1001, err.Error(), ""
+		return 1001, err.Error(), nil
 	}
 
-	return 0, "", token
+	return 0, "", map[string]string{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	}
 }
 
 // Login 登录
