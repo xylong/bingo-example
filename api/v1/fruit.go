@@ -2,6 +2,7 @@ package v1
 
 import (
 	"bingo-example/application/service"
+	"github.com/gin-gonic/gin"
 	"github.com/xylong/bingo"
 )
 
@@ -25,6 +26,6 @@ func (c *FruitController) Route(group *bingo.Group) {
 	group.GET("top", c.top)
 }
 
-func (c *FruitController) top(ctx *bingo.Context) interface{} {
+func (c *FruitController) top(ctx *gin.Context) interface{} {
 	return c.Service.Top()
 }

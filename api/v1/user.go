@@ -5,6 +5,7 @@ import (
 	"bingo-example/application/middleware"
 	"bingo-example/application/service"
 	"bingo-example/constants"
+	"bingo-example/constants/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/xylong/bingo"
 )
@@ -25,7 +26,7 @@ func (c *UserCtrl) Name() string {
 	return "UserCtrl"
 }
 
-func (c *UserCtrl) index(ctx *bingo.Context) interface{} {
+func (c *UserCtrl) index(ctx *gin.Context) interface{} {
 	req := &dto.UserRequest{}
 	if err := ctx.ShouldBind(req); err != nil {
 		return err.Error()
@@ -38,26 +39,42 @@ func (c *UserCtrl) index(ctx *bingo.Context) interface{} {
 	}
 }
 
-func (c *UserCtrl) register(ctx *bingo.Context) (int, string, interface{}) {
-	return c.Service.Register(
-		ctx.Binding(ctx.ShouldBind, &dto.RegisterParam{}).
-			Unwrap().(*dto.RegisterParam))
+func (c *UserCtrl) register(ctx *gin.Context) (int, string, interface{}) {
+	return 0, "", nil
+	//return c.Service.Register(
+	//	ctx.Binding(ctx.ShouldBind, &dto.RegisterParam{}).
+	//		Unwrap().(*dto.RegisterParam))
 }
 
-func (c *UserCtrl) login(ctx *bingo.Context) (int, string, interface{}) {
-	return c.Service.Login(
-		ctx.Binding(ctx.ShouldBind, &dto.LoginParam{}).
-			Unwrap().(*dto.LoginParam))
+func (c *UserCtrl) login(ctx *gin.Context) (int, string, interface{}) {
+	param := &dto.LoginParam{}
+	if err := ctx.ShouldBind(param); err != nil {
+		return errors.ParamError.Int(), errors.ParamError.String(), nil
+	}
+
+	return c.Service.Login(param)
+	//return c.Service.Login(
+	//	ctx.Binding(ctx.ShouldBind, &dto.LoginParam{}).
+	//		Unwrap().(*dto.LoginParam))
 }
 
-func (c *UserCtrl) me(ctx *bingo.Context) (int, string, interface{}) {
+// @Summary 个人信息
+// @Description 登录人信息
+// @Tags 用户
+// @Security ApiKeyAuth
+// @Produce  json
+// @Param Authorization header string true "Bearer token"
+// @Success 200 {object} dto.Profile "success"
+// @Router /v1/me [get]
+func (c *UserCtrl) me(ctx *gin.Context) (int, string, interface{}) {
 	return c.Service.Profile(ctx.GetInt(constants.SessionID))
 }
 
-func (c *UserCtrl) countRegister(ctx *bingo.Context) interface{} {
-	return c.Service.CountReg(ctx,
-		ctx.Binding(ctx.ShouldBind, &dto.RegisterCountRequest{}).
-			Unwrap().(*dto.RegisterCountRequest))
+func (c *UserCtrl) countRegister(ctx *gin.Context) interface{} {
+	return nil
+	//return c.Service.CountReg(ctx,
+	//	ctx.Binding(ctx.ShouldBind, &dto.RegisterCountRequest{}).
+	//		Unwrap().(*dto.RegisterCountRequest))
 }
 
 func (c *UserCtrl) Route(group *bingo.Group) {
@@ -68,5 +85,5 @@ func (c *UserCtrl) Route(group *bingo.Group) {
 
 	group.Group("", func(group *bingo.Group) {
 		group.GET("me", c.me)
-	}, middleware.NewAuthentication())
+	}, middleware.NewCors(), middleware.NewAuthentication())
 }

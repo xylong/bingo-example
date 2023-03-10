@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"bingo-example/application/dto"
 	"bingo-example/application/service"
+	"github.com/gin-gonic/gin"
 	"github.com/xylong/bingo"
 )
 
@@ -22,13 +22,14 @@ func (c *QuestionController) Name() string {
 	return "questions"
 }
 
-func (c *QuestionController) create(ctx *bingo.Context) (int, string, interface{}) {
-	return c.Service.Create(
-		ctx.Binding(ctx.ShouldBind, &dto.QuestionParam{}).
-			Unwrap().(*dto.QuestionParam))
+func (c *QuestionController) create(ctx *gin.Context) (int, string, interface{}) {
+	return 0, "", nil
+	//return c.Service.Create(
+	//	ctx.Binding(ctx.ShouldBind, &dto.QuestionParam{}).
+	//		Unwrap().(*dto.QuestionParam))
 }
 
-func (c *QuestionController) singleChoice(ctx *bingo.Context) string {
+func (c *QuestionController) singleChoice(ctx *gin.Context) string {
 	return "单选题"
 }
 

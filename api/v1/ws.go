@@ -2,6 +2,7 @@ package v1
 
 import (
 	"bingo-example/application/service/ws"
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/xylong/bingo"
 	"net/http"
@@ -26,7 +27,7 @@ func (c *WsController) Route(group *bingo.Group) {
 }
 
 // upgradeWs 升级ws协议
-func (c *WsController) upgradeWs(ctx *bingo.Context) {
+func (c *WsController) upgradeWs(ctx *gin.Context) {
 	conn, err := (&websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
 			return true

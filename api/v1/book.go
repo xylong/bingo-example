@@ -20,11 +20,11 @@ func NewBookController() *BookController {
 	return &BookController{}
 }
 
-func (c *BookController) import2es(ctx *bingo.Context) {
+func (c *BookController) import2es(ctx *gin.Context) {
 	c.Service.BatchImport(ctx)
 }
 
-func (c *BookController) index(ctx *bingo.Context) {
+func (c *BookController) index(ctx *gin.Context) {
 	schema := c.Service.GraphSchema(ctx)
 
 	handler.New(&handler.Config{
@@ -32,19 +32,20 @@ func (c *BookController) index(ctx *bingo.Context) {
 	}).ServeHTTP(ctx.Writer, ctx.Request)
 }
 
-func (c *BookController) show(ctx *bingo.Context) interface{} {
+func (c *BookController) show(ctx *gin.Context) interface{} {
 	return c.Service.GetByID(ctx, ctx.Param("id"))
 }
 
-func (c *BookController) search(ctx *bingo.Context) interface{} {
-	return c.Service.Search(ctx, ctx.Binding(ctx.ShouldBind, &dto.BookSearchParam{}).Unwrap().(*dto.BookSearchParam))
+func (c *BookController) search(ctx *gin.Context) interface{} {
+	return nil
+	//return c.Service.Search(ctx, ctx.Binding(ctx.ShouldBind, &dto.BookSearchParam{}).Unwrap().(*dto.BookSearchParam))
 }
 
-func (c *BookController) press(ctx *bingo.Context) interface{} {
+func (c *BookController) press(ctx *gin.Context) interface{} {
 	return c.Service.GetPress(ctx)
 }
 
-func (c *BookController) create(ctx *bingo.Context) interface{} {
+func (c *BookController) create(ctx *gin.Context) interface{} {
 	param := &dto.BookStoreParam{}
 	if err := ctx.ShouldBind(param); err != nil {
 		return gin.H{"msg": err.Error()}
@@ -53,7 +54,7 @@ func (c *BookController) create(ctx *bingo.Context) interface{} {
 	return c.Service.Create(ctx, param)
 }
 
-func (c *BookController) update(ctx *bingo.Context) interface{} {
+func (c *BookController) update(ctx *gin.Context) interface{} {
 	url := &dto.BookUrlRequest{}
 	if err := ctx.ShouldBindUri(url); err != nil {
 		return gin.H{"msg": err.Error()}
@@ -67,10 +68,10 @@ func (c *BookController) update(ctx *bingo.Context) interface{} {
 	return c.Service.Update(ctx, url, param)
 }
 
-func (c *BookController) delete(ctx *bingo.Context) interface{} {
-	if err := c.Service.Delete(ctx, ctx.Binding(ctx.ShouldBindUri, &dto.BookUrlRequest{}).Unwrap().(*dto.BookUrlRequest)); err != nil {
-		return gin.H{"code": 10000, "msg": err.Error(), "data": nil}
-	}
+func (c *BookController) delete(ctx *gin.Context) interface{} {
+	//if err := c.Service.Delete(ctx, ctx.Binding(ctx.ShouldBindUri, &dto.BookUrlRequest{}).Unwrap().(*dto.BookUrlRequest)); err != nil {
+	//	return gin.H{"code": 10000, "msg": err.Error(), "data": nil}
+	//}
 
 	return gin.H{"code": 0, "msg": "", "data": nil}
 }

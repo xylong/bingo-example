@@ -6,7 +6,6 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/xylong/bingo"
 	"go.uber.org/zap"
 	"net/http"
 	"strings"
@@ -19,7 +18,7 @@ func NewAuthentication() *Authentication {
 	return &Authentication{}
 }
 
-func (a *Authentication) Before(ctx *bingo.Context) error {
+func (a *Authentication) Before(ctx *gin.Context) error {
 	var err error
 
 	defer func() {
@@ -31,7 +30,7 @@ func (a *Authentication) Before(ctx *bingo.Context) error {
 		}
 	}()
 
-	tokenStr := ctx.Token()
+	tokenStr := ctx.Request.Header.Get("Authorization")
 	if tokenStr == "" {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,
