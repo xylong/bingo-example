@@ -1,0 +1,73 @@
+basePath: /
+definitions:
+  dto.Profile:
+    properties:
+      avatar:
+        description: 头像
+        type: string
+      birthday:
+        description: "\U0001F382"
+        type: string
+      created_at:
+        description: 注册时间
+        type: string
+      email:
+        description: "\U0001F4EE"
+        type: string
+      gender:
+        description: 性别
+        type: string
+      id:
+        type: integer
+      level:
+        description: 等级
+        type: integer
+      nickname:
+        description: 昵称
+        type: string
+      phone:
+        description: 手机号
+        type: string
+      signature:
+        description: 个性签名
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: bingo案例
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Bingo Example API
+  version: "1.0"
+paths:
+  /v1/me:
+    get:
+      description: 登录人信息
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/dto.Profile'
+      security:
+      - ApiKeyAuth: []
+      summary: 个人信息
+      tags:
+      - 用户
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

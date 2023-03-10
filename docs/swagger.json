@@ -1,0 +1,107 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "bingo案例",
+        "title": "Bingo Example API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/v1/me": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "登录人信息",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户"
+                ],
+                "summary": "个人信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Profile"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.Profile": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "头像",
+                    "type": "string"
+                },
+                "birthday": {
+                    "description": "🎂",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "注册时间",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "📮",
+                    "type": "string"
+                },
+                "gender": {
+                    "description": "性别",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "level": {
+                    "description": "等级",
+                    "type": "integer"
+                },
+                "nickname": {
+                    "description": "昵称",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "手机号",
+                    "type": "string"
+                },
+                "signature": {
+                    "description": "个性签名",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
+        }
+    }
+}

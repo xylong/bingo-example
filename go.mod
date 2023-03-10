@@ -25,9 +25,7 @@ require (
 	gorm.io/gorm v1.23.5
 )
 
-replace (
-	github.com/xylong/bingo => ../bingo
-)
+replace github.com/xylong/bingo => ../bingo
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect

@@ -8,6 +8,7 @@ bingo脚手架使用demo
 - [elastic](https://github.com/olivere/elastic) es
 - [graphql](https://github.com/graphql-go/graphql)
 - [mongo](https://go.mongodb.org/mongo-driver) mongodb
+- [swagger](https://github.com/swaggo/gin-swagger) 文档
 
 ### 命令
 - swag init -g ./cmd/main.go
