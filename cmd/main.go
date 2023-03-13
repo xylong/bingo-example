@@ -3,6 +3,7 @@ package main
 import (
 	v1 "bingo-example/api/v1"
 	"bingo-example/application/middleware"
+	"bingo-example/bootstrap"
 	"bingo-example/bootstrap/routes"
 	_ "bingo-example/config"
 	_ "bingo-example/docs"
@@ -35,7 +36,7 @@ func main() {
 	config.InitConfig(env)
 
 	bingo.Init("conf", "app").
-		Inject(core.NewClient(), core.NewService()).
+		Inject(bootstrap.NewClient(), core.NewService()).
 		Route("swagger", routes.Swagger).
 		Mount("v1", v1.Controller...)(middleware.Cors).
 		Lunch()

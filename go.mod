@@ -23,7 +23,8 @@ require (
 	go.uber.org/zap v1.23.0
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	gorm.io/driver/mysql v1.3.4
-	gorm.io/gorm v1.23.5
+	gorm.io/driver/sqlite v1.4.4
+	gorm.io/gorm v1.24.0
 )
 
 replace github.com/xylong/bingo => ../bingo
@@ -57,6 +58,7 @@ require (
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
+	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
