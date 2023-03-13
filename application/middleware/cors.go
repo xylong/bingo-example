@@ -1,19 +1,25 @@
 package middleware
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-// Cors 跨域
-type Cors struct {
+// 跨域
+type cors struct {
 }
 
-func NewCors() *Cors {
-	return &Cors{}
+func newCors() *cors {
+	return &cors{}
 }
 
-func (c *Cors) Before(ctx *gin.Context) error {
+func (c *cors) Name() string {
+	return "cors"
+}
+
+func (c *cors) Before(ctx *gin.Context) error {
+	fmt.Println("before cors")
 	method := ctx.Request.Method
 
 	ctx.Header("Access-Control-Allow-Origin", "*")
@@ -26,10 +32,10 @@ func (c *Cors) Before(ctx *gin.Context) error {
 		ctx.AbortWithStatus(http.StatusNoContent)
 	}
 
-	ctx.Next()
 	return nil
 }
 
-func (c *Cors) After(data interface{}) (interface{}, error) {
+func (c *cors) After(data interface{}) (interface{}, error) {
+	fmt.Println("after cors")
 	return data, nil
 }

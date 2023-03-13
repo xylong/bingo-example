@@ -13,4 +13,5 @@ const (
 
 	Unauthorized  Code = 1001 // 未授权
 	PasswordError Code = 1002 // 帐号或密码错误
+	RegisterError Code = 1003 // 注册失败
 )

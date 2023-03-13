@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  dto.Profile:
+  bingo-example_application_dto.Profile:
     properties:
       avatar:
         description: 头像
@@ -32,6 +32,16 @@ definitions:
         description: 个性签名
         type: string
     type: object
+  bingo-example_application_dto.RegisterCount:
+    properties:
+      date:
+        type: string
+      total:
+        type: integer
+    type: object
+  gin.H:
+    additionalProperties: {}
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -61,10 +71,47 @@ paths:
         "200":
           description: success
           schema:
-            $ref: '#/definitions/dto.Profile'
+            $ref: '#/definitions/bingo-example_application_dto.Profile'
       security:
       - ApiKeyAuth: []
       summary: 个人信息
+      tags:
+      - 用户
+  /v1/reg-count:
+    get:
+      description: 按月统计当月每天注册人数
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Y-d
+        in: query
+        name: month
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 结果按日期分组
+          schema:
+            allOf:
+            - $ref: '#/definitions/gin.H'
+            - properties:
+                code:
+                  type: integer
+                data:
+                  items:
+                    $ref: '#/definitions/bingo-example_application_dto.RegisterCount'
+                  type: array
+                message:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 注册统计
       tags:
       - 用户
 securityDefinitions:

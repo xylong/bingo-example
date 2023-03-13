@@ -52,7 +52,69 @@ const docTemplate = `{
                     "200": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/dto.Profile"
+                            "$ref": "#/definitions/bingo-example_application_dto.Profile"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/reg-count": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "按月统计当月每天注册人数",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户"
+                ],
+                "summary": "注册统计",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Y-d",
+                        "name": "month",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "结果按日期分组",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gin.H"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/bingo-example_application_dto.RegisterCount"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -60,7 +122,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.Profile": {
+        "bingo-example_application_dto.Profile": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -103,6 +165,21 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "bingo-example_application_dto.RegisterCount": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gin.H": {
+            "type": "object",
+            "additionalProperties": {}
         }
     },
     "securityDefinitions": {

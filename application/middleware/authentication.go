@@ -4,6 +4,7 @@ import (
 	"bingo-example/application/utils/token"
 	"bingo-example/constants"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"go.uber.org/zap"
@@ -11,14 +12,19 @@ import (
 	"strings"
 )
 
-// Authentication 鉴权
-type Authentication struct{}
+// authentication 鉴权
+type authentication struct{}
 
-func NewAuthentication() *Authentication {
-	return &Authentication{}
+func newAuthentication() *authentication {
+	return &authentication{}
 }
 
-func (a *Authentication) Before(ctx *gin.Context) error {
+func (a *authentication) Name() string {
+	return "auth"
+}
+
+func (a *authentication) Before(ctx *gin.Context) error {
+	fmt.Println("before auth")
 	var err error
 
 	defer func() {
@@ -70,6 +76,7 @@ func (a *Authentication) Before(ctx *gin.Context) error {
 	return nil
 }
 
-func (a *Authentication) After(data interface{}) (interface{}, error) {
+func (a *authentication) After(data interface{}) (interface{}, error) {
+	fmt.Println("after auth")
 	return data, nil
 }

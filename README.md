@@ -11,4 +11,5 @@ bingo脚手架使用demo
 - [swagger](https://github.com/swaggo/gin-swagger) 文档
 
 ### 命令
-- swag init -g ./cmd/main.go
+- swag init -g cmd/main.go
+- swag init --parseDependency --parseInternal -g cmd/main.go

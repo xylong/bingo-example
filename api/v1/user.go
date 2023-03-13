@@ -6,6 +6,8 @@ import (
 	"bingo-example/application/service"
 	"bingo-example/constants"
 	"bingo-example/constants/errors"
+	"bingo-example/pkg/response"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xylong/bingo"
 )
@@ -40,10 +42,12 @@ func (c *UserCtrl) index(ctx *gin.Context) interface{} {
 }
 
 func (c *UserCtrl) register(ctx *gin.Context) (int, string, interface{}) {
-	return 0, "", nil
-	//return c.Service.Register(
-	//	ctx.Binding(ctx.ShouldBind, &dto.RegisterParam{}).
-	//		Unwrap().(*dto.RegisterParam))
+	var param dto.RegisterParam
+	if err := ctx.ShouldBind(&param); err != nil {
+		return errors.RegisterError.Int(), errors.RegisterError.String(), nil
+	}
+
+	return c.Service.Register(&param)
 }
 
 func (c *UserCtrl) login(ctx *gin.Context) (int, string, interface{}) {
@@ -53,9 +57,11 @@ func (c *UserCtrl) login(ctx *gin.Context) (int, string, interface{}) {
 	}
 
 	return c.Service.Login(param)
-	//return c.Service.Login(
-	//	ctx.Binding(ctx.ShouldBind, &dto.LoginParam{}).
-	//		Unwrap().(*dto.LoginParam))
+}
+
+func (c *UserCtrl) resetPassword(ctx *gin.Context) interface{} {
+	fmt.Println("reset")
+	return true
 }
 
 // @Summary 个人信息
@@ -70,11 +76,22 @@ func (c *UserCtrl) me(ctx *gin.Context) (int, string, interface{}) {
 	return c.Service.Profile(ctx.GetInt(constants.SessionID))
 }
 
+// @Summary 注册统计
+// @Description 按月统计当月每天注册人数
+// @Tags 用户
+// @Produce  json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer token"
+// @Param month query string true "Y-d"
+// @success 200 {object} gin.H{code=int,data=[]dto.RegisterCount,message=string} "结果按日期分组"
+// @Router /v1/reg-count [get]
 func (c *UserCtrl) countRegister(ctx *gin.Context) interface{} {
-	return nil
-	//return c.Service.CountReg(ctx,
-	//	ctx.Binding(ctx.ShouldBind, &dto.RegisterCountRequest{}).
-	//		Unwrap().(*dto.RegisterCountRequest))
+	var param *dto.RegisterCountRequest
+	if err := ctx.ShouldBind(&param); err != nil {
+		return response.BadRequest(err)
+	}
+
+	return response.Data(c.Service.CountReg(ctx, param))
 }
 
 func (c *UserCtrl) Route(group *bingo.Group) {
@@ -85,5 +102,10 @@ func (c *UserCtrl) Route(group *bingo.Group) {
 
 	group.Group("", func(group *bingo.Group) {
 		group.GET("me", c.me)
-	}, middleware.NewCors(), middleware.NewAuthentication())
+
+		group.Group("reset", func(group *bingo.Group) {
+			group.POST("password", c.resetPassword)
+		}, middleware.Request)
+
+	}, middleware.Auth)
 }
