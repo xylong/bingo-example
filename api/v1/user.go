@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xylong/bingo"
+	"strconv"
 )
 
 func init() {
@@ -41,10 +42,44 @@ func (c *UserCtrl) index(ctx *gin.Context) interface{} {
 	}
 }
 
-func (c *UserCtrl) register(ctx *gin.Context) (int, string, interface{}) {
+// @Summary 用户详情
+// @Description 手机号码注册
+// @Tags 用户
+// @Produce  json
+// @Param id path int true "用户id"
+// @Success 200 {object} dto.Profile "用户信息"
+// @Failure 404 {object} any "{"code":404,"data":null,"msg":"未查询到结果"}"
+// @Router /v1/users/{id} [get]
+func (c *UserCtrl) show(ctx *gin.Context) interface{} {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	{
+		if err != nil {
+			return response.BadRequest(err)
+		}
+		if id <= 0 {
+			return response.BadRequest(fmt.Errorf("id必须大于0"))
+		}
+	}
+
+	if data, err := c.Service.Profile(id); err != nil {
+		return response.Error(ctx, err)
+	} else {
+		return response.Data(data)
+	}
+}
+
+// @Summary 注册
+// @Description 手机号码注册
+// @Tags 用户
+// @Produce  json
+// @Param param body dto.RegisterParam  true "注册表单"
+// @Success 200 {object} any "{"code":0,"data":{"access_token":"","refresh_token":""},"msg":"ok"}"
+// @Failure 400 {object} any "{"code":400,"data":null,"msg":"参数错误"}"
+// @Router /v1/register [post]
+func (c *UserCtrl) register(ctx *gin.Context) interface{} {
 	var param dto.RegisterParam
 	if err := ctx.ShouldBind(&param); err != nil {
-		return errors.RegisterError.Int(), errors.RegisterError.String(), nil
+		return response.BadRequest(err)
 	}
 
 	return c.Service.Register(&param)
@@ -72,8 +107,12 @@ func (c *UserCtrl) resetPassword(ctx *gin.Context) interface{} {
 // @Param Authorization header string true "Bearer token"
 // @Success 200 {object} dto.Profile "success"
 // @Router /v1/me [get]
-func (c *UserCtrl) me(ctx *gin.Context) (int, string, interface{}) {
-	return c.Service.Profile(ctx.GetInt(constants.SessionID))
+func (c *UserCtrl) me(ctx *gin.Context) interface{} {
+	if data, err := c.Service.Profile(ctx.GetInt(constants.SessionID)); err != nil {
+		return response.Error(ctx, err)
+	} else {
+		return response.Data(data)
+	}
 }
 
 // @Summary 注册统计
@@ -83,7 +122,7 @@ func (c *UserCtrl) me(ctx *gin.Context) (int, string, interface{}) {
 // @Security ApiKeyAuth
 // @Param Authorization header string true "Bearer token"
 // @Param month query string true "Y-d"
-// @success 200 {object} gin.H{code=int,data=[]dto.RegisterCount,message=string} "结果按日期分组"
+// @success 200 {object} any{code=int,data=[]dto.RegisterCount,message=string} "结果按日期分组"
 // @Router /v1/reg-count [get]
 func (c *UserCtrl) countRegister(ctx *gin.Context) interface{} {
 	var param *dto.RegisterCountRequest
@@ -96,6 +135,7 @@ func (c *UserCtrl) countRegister(ctx *gin.Context) interface{} {
 
 func (c *UserCtrl) Route(group *bingo.Group) {
 	group.GET("users", c.index)
+	group.GET("users/:id", c.show)
 	group.POST("register", c.register)
 	group.POST("login", c.login)
 	group.GET("reg-count", c.countRegister)

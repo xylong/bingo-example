@@ -52,7 +52,7 @@ const docTemplate = `{
                     "200": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/bingo-example_application_dto.Profile"
+                            "$ref": "#/definitions/dto.Profile"
                         }
                     }
                 }
@@ -95,7 +95,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/gin.H"
+                                    "type": "object"
                                 },
                                 {
                                     "type": "object",
@@ -106,7 +106,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/bingo-example_application_dto.RegisterCount"
+                                                "$ref": "#/definitions/dto.RegisterCount"
                                             }
                                         },
                                         "message": {
@@ -119,10 +119,82 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/v1/register": {
+            "post": {
+                "description": "手机号码注册",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户"
+                ],
+                "summary": "注册",
+                "parameters": [
+                    {
+                        "description": "注册表单",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RegisterParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":0,\"data\":{\"access_token\":\"\",\"refresh_token\":\"\"},\"msg\":\"ok\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"data\":null,\"msg\":\"参数错误\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/users/{id}": {
+            "get": {
+                "description": "手机号码注册",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户"
+                ],
+                "summary": "用户详情",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "用户id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "用户信息",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Profile"
+                        }
+                    },
+                    "404": {
+                        "description": "{\"code\":404,\"data\":null,\"msg\":\"未查询到结果\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "bingo-example_application_dto.Profile": {
+        "dto.Profile": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -166,20 +238,41 @@ const docTemplate = `{
                 }
             }
         },
-        "bingo-example_application_dto.RegisterCount": {
+        "dto.RegisterCount": {
             "type": "object",
             "properties": {
                 "date": {
+                    "description": "年-月-日",
                     "type": "string"
                 },
                 "total": {
+                    "description": "统计结果",
                     "type": "integer"
                 }
             }
         },
-        "gin.H": {
+        "dto.RegisterParam": {
             "type": "object",
-            "additionalProperties": {}
+            "required": [
+                "code",
+                "password",
+                "phone"
+            ],
+            "properties": {
+                "code": {
+                    "description": "短信码",
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 18,
+                    "minLength": 6
+                },
+                "phone": {
+                    "description": "手机号",
+                    "type": "string"
+                }
+            }
         }
     },
     "securityDefinitions": {

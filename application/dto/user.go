@@ -14,7 +14,7 @@ type (
 
 	// RegisterCountRequest 注册统计
 	RegisterCountRequest struct {
-		Month string `form:"month" json:"month"`
+		Month string `form:"month" json:"month"` // 年-月
 	}
 )
 
@@ -54,7 +54,7 @@ type (
 
 	// RegisterCount 注册统计
 	RegisterCount struct {
-		Date  string `json:"date"`
-		Total int64  `json:"total"`
+		Date  string `json:"date"`  // 年-月-日
+		Total int64  `json:"total"` // 统计结果
 	}
 )

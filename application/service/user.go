@@ -31,24 +31,24 @@ func (s *UserService) Index() string {
 }
 
 // Register 注册
-func (s *UserService) Register(param *dto.RegisterParam) (int, string, map[string]string) {
+func (s *UserService) Register(param *dto.RegisterParam) map[string]string {
 	tx := s.DB.Begin()
 
 	member := new(aggregate.Member).Builder(s.Req.Register2User(param)).
 		SetProfile(s.Req.Register2Profile(param)).SetUserRepo(tx).SetProfileRepo(tx).Build()
 	if err := member.Create(); err != nil {
 		tx.Rollback()
-		return 1001, err.Error(), nil
+		return nil
 	} else {
 		tx.Commit()
 	}
 
 	accessToken, refreshToken, err := token.Generate(member.User.ID)
 	if err != nil {
-		return 1001, err.Error(), nil
+		return nil
 	}
 
-	return 0, "", map[string]string{
+	return map[string]string{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 	}
@@ -77,7 +77,7 @@ func (s *UserService) Login(param *dto.LoginParam) (int, string, map[string]stri
 }
 
 // Profile 个人信息
-func (s *UserService) Profile(id int) (int, string, *dto.Profile) {
+func (s *UserService) Profile(id int) (*dto.Profile, error) {
 	// 1.从缓存取信息
 	profile := &dto.Profile{}
 	ctx := context.Background()
@@ -93,7 +93,7 @@ func (s *UserService) Profile(id int) (int, string, *dto.Profile) {
 		if err := new(aggregate.Member).Builder(u).SetUserRepo(s.DB).Build().Take(map[string][]string{
 			"":        []string{"id", "phone", "email", "nickname", "avatar", "created_at"},
 			"Profile": []string{"user_id", "birthday", "gender", "level", "signature"}}); err != nil {
-			return 1002, "not found", nil
+			return nil, err
 		}
 
 		profile = s.Rep.User2Profile(u)
@@ -106,7 +106,7 @@ func (s *UserService) Profile(id int) (int, string, *dto.Profile) {
 		}
 	}
 
-	return 0, "", profile
+	return profile, nil
 }
 
 // Get 获取用户

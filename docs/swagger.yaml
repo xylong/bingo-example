@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  bingo-example_application_dto.Profile:
+  dto.Profile:
     properties:
       avatar:
         description: 头像
@@ -32,15 +32,31 @@ definitions:
         description: 个性签名
         type: string
     type: object
-  bingo-example_application_dto.RegisterCount:
+  dto.RegisterCount:
     properties:
       date:
+        description: 年-月-日
         type: string
       total:
+        description: 统计结果
         type: integer
     type: object
-  gin.H:
-    additionalProperties: {}
+  dto.RegisterParam:
+    properties:
+      code:
+        description: 短信码
+        type: integer
+      password:
+        maxLength: 18
+        minLength: 6
+        type: string
+      phone:
+        description: 手机号
+        type: string
+    required:
+    - code
+    - password
+    - phone
     type: object
 host: localhost:8080
 info:
@@ -71,7 +87,7 @@ paths:
         "200":
           description: success
           schema:
-            $ref: '#/definitions/bingo-example_application_dto.Profile'
+            $ref: '#/definitions/dto.Profile'
       security:
       - ApiKeyAuth: []
       summary: 个人信息
@@ -98,13 +114,13 @@ paths:
           description: 结果按日期分组
           schema:
             allOf:
-            - $ref: '#/definitions/gin.H'
+            - type: object
             - properties:
                 code:
                   type: integer
                 data:
                   items:
-                    $ref: '#/definitions/bingo-example_application_dto.RegisterCount'
+                    $ref: '#/definitions/dto.RegisterCount'
                   type: array
                 message:
                   type: string
@@ -112,6 +128,53 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: 注册统计
+      tags:
+      - 用户
+  /v1/register:
+    post:
+      description: 手机号码注册
+      parameters:
+      - description: 注册表单
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":0,"data":{"access_token":"","refresh_token":""},"msg":"ok"}'
+          schema:
+            type: object
+        "400":
+          description: '{"code":400,"data":null,"msg":"参数错误"}'
+          schema:
+            type: object
+      summary: 注册
+      tags:
+      - 用户
+  /v1/users/{id}:
+    get:
+      description: 手机号码注册
+      parameters:
+      - description: 用户id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 用户信息
+          schema:
+            $ref: '#/definitions/dto.Profile'
+        "404":
+          description: '{"code":404,"data":null,"msg":"未查询到结果"}'
+          schema:
+            type: object
+      summary: 用户详情
       tags:
       - 用户
 securityDefinitions:

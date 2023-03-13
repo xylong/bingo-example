@@ -4,8 +4,11 @@ import (
 	v1 "bingo-example/api/v1"
 	"bingo-example/application/middleware"
 	"bingo-example/bootstrap/routes"
+	_ "bingo-example/config"
 	_ "bingo-example/docs"
 	"bingo-example/lib/core"
+	"bingo-example/pkg/config"
+	"flag"
 	"github.com/xylong/bingo"
 )
 
@@ -26,6 +29,11 @@ import (
 
 // @securityDefinitions.basic  BasicAuth
 func main() {
+	var env string
+	flag.StringVar(&env, "env", "", "加载 .env 文件，如 --env=testing 加载的是 .env.testing 文件")
+	flag.Parse()
+	config.InitConfig(env)
+
 	bingo.Init("conf", "app").
 		Inject(core.NewClient(), core.NewService()).
 		Route("swagger", routes.Swagger).

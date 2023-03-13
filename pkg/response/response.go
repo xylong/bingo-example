@@ -9,17 +9,17 @@ import (
 
 // Error 响应 404 或 422，未传参 msg 时使用默认消息
 // 处理请求时出现错误 err，会附带返回 error 信息，如登录错误、找不到 ID 对应的 Model
-func Error(ctx *gin.Context, err error, msg ...string) {
+func Error(ctx *gin.Context, err error, msg ...string) gin.H {
 	// error 类型为『数据库未找到内容』
 	if err == gorm.ErrRecordNotFound {
 		Abort404(ctx)
-		return
+		return nil
 	}
 
-	ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
+	return gin.H{
 		"message": message("请求处理失败，请查看 error 的值", msg...),
 		"error":   err.Error(),
-	})
+	}
 }
 
 // Success 响应 200 和预设『操作成功！』的 JSON 数据
@@ -77,7 +77,7 @@ func Abort500(ctx *gin.Context, msg ...string) {
 func BadRequest(err error, msg ...string) gin.H {
 	return gin.H{
 		"code":    errors.ParamError,
-		"message": message("请求解析错误，请确认请求格式是否正确。上传文件请使用 multipart 标头，参数请使用 JSON 格式。", msg...),
+		"message": message("参数错误", msg...),
 		"error":   err.Error(),
 	}
 }
