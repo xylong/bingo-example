@@ -1,13 +1,13 @@
 package main
 
 import (
-	"bingo-example/application/middleware"
 	"bingo-example/bootstrap"
 	"bingo-example/bootstrap/routes"
 	_ "bingo-example/config"
 	_ "bingo-example/docs"
 	"bingo-example/http/controllers/api/v1"
 	_ "bingo-example/http/controllers/api/v1/auth"
+	"bingo-example/http/middlewares"
 	"bingo-example/lib/core"
 	"bingo-example/pkg/config"
 	"flag"
@@ -36,9 +36,11 @@ func main() {
 	flag.Parse()
 	config.InitConfig(env)
 
+	bootstrap.SetupLogger()
+
 	bingo.Init("conf", "app").
 		Inject(bootstrap.NewClient(), core.NewService()).
 		Route("swagger", routes.Swagger).
-		Mount("v1", v1.Controller...)(middleware.Cors).
+		Mount("v1", v1.Controller...)(middlewares.Cors, middlewares.Log).
 		Lunch()
 }

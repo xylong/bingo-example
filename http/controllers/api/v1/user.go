@@ -2,10 +2,10 @@ package v1
 
 import (
 	"bingo-example/application/dto"
-	"bingo-example/application/middleware"
 	"bingo-example/application/service"
 	"bingo-example/constants"
 	"bingo-example/constants/errors"
+	"bingo-example/http/middlewares"
 	"bingo-example/pkg/response"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -145,7 +145,7 @@ func (c *UserCtrl) Route(group *bingo.Group) {
 
 		group.Group("reset", func(group *bingo.Group) {
 			group.POST("password", c.resetPassword)
-		}, middleware.Request)
+		}, middlewares.Request)
 
-	}, middleware.Auth)
+	}, middlewares.Auth)
 }
