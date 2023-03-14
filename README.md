@@ -9,6 +9,7 @@ bingo脚手架使用demo
 - [graphql](https://github.com/graphql-go/graphql)
 - [mongo](https://go.mongodb.org/mongo-driver) mongodb
 - [swagger](https://github.com/swaggo/gin-swagger) 文档
+- [govalidator](https://github.com/thedevsaddam/govalidator) 验证器
 
 ### 命令
 - swag init -g cmd/main.go

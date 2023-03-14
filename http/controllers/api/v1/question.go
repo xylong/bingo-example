@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	registerCtrl(NewQuestionController())
+	RegisterCtrl(NewQuestionController())
 }
 
 type QuestionController struct {

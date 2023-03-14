@@ -93,11 +93,12 @@ func BadRequest(err error, msg ...string) gin.H {
 //	    },
 //	    "message": "请求验证不通过，具体请查看 errors"
 //	}
-func ValidationError(c *gin.Context, errors map[string][]string) {
-	c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
-		"message": "请求验证不通过，具体请查看 errors",
+func ValidationError(ctx *gin.Context, errors map[string][]string) gin.H {
+	return gin.H{
+		"code":    http.StatusUnprocessableEntity,
+		"message": message("请求验证不通过"),
 		"errors":  errors,
-	})
+	}
 }
 
 // Unauthorized 响应 401，未传参 msg 时使用默认消息

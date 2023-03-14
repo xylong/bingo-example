@@ -1,12 +1,13 @@
 package main
 
 import (
-	v1 "bingo-example/api/v1"
 	"bingo-example/application/middleware"
 	"bingo-example/bootstrap"
 	"bingo-example/bootstrap/routes"
 	_ "bingo-example/config"
 	_ "bingo-example/docs"
+	"bingo-example/http/controllers/api/v1"
+	_ "bingo-example/http/controllers/api/v1/auth"
 	"bingo-example/lib/core"
 	"bingo-example/pkg/config"
 	"flag"

@@ -49,3 +49,15 @@ func (r *UserRepo) CountRegister(result interface{}, month string) (interface{},
 
 	return result, err
 }
+
+func (r *UserRepo) IsPhoneExist(phone string) bool {
+	var count int64
+	r.db.Model(&user.User{}).Where("phone=?", phone).Count(&count)
+	return count > 0
+}
+
+func (r *UserRepo) IsEmailExist(email string) bool {
+	var count int64
+	r.db.Model(&user.User{}).Where("email = ?", email).Count(&count)
+	return count > 0
+}

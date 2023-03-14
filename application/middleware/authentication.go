@@ -72,7 +72,6 @@ func (a *authentication) Before(ctx *gin.Context) error {
 	}
 
 	ctx.Set(constants.SessionID, claims.ID)
-	ctx.Next()
 	return nil
 }
 

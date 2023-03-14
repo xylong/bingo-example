@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	registerCtrl(NewNewController())
+	RegisterCtrl(NewNewController())
 }
 
 type NewController struct {

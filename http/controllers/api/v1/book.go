@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	registerCtrl(NewBookController())
+	RegisterCtrl(NewBookController())
 }
 
 type BookController struct {

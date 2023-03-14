@@ -11,6 +11,7 @@ func _() {
 	_ = x[OK-0]
 	_ = x[ParamError-400]
 	_ = x[NotFound-404]
+	_ = x[Unprocessable-422]
 	_ = x[Unauthorized-1001]
 	_ = x[PasswordError-1002]
 	_ = x[RegisterError-1003]
@@ -20,11 +21,12 @@ const (
 	_Code_name_0 = "OK"
 	_Code_name_1 = "参数错误"
 	_Code_name_2 = "未找到"
-	_Code_name_3 = "未授权帐号或密码错误注册失败"
+	_Code_name_3 = "无法处理"
+	_Code_name_4 = "未授权帐号或密码错误注册失败"
 )
 
 var (
-	_Code_index_3 = [...]uint8{0, 9, 30, 42}
+	_Code_index_4 = [...]uint8{0, 9, 30, 42}
 )
 
 func (i Code) String() string {
@@ -35,9 +37,11 @@ func (i Code) String() string {
 		return _Code_name_1
 	case i == 404:
 		return _Code_name_2
+	case i == 422:
+		return _Code_name_3
 	case 1001 <= i && i <= 1003:
 		i -= 1001
-		return _Code_name_3[_Code_index_3[i]:_Code_index_3[i+1]]
+		return _Code_name_4[_Code_index_4[i]:_Code_index_4[i+1]]
 	default:
 		return "Code(" + strconv.FormatInt(int64(i), 10) + ")"
 	}

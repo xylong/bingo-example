@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	registerCtrl(NewUserCtrl())
+	RegisterCtrl(NewUserCtrl())
 }
 
 type UserCtrl struct {

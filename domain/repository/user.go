@@ -21,4 +21,10 @@ type IUserRepo interface {
 
 	// CountRegister 统计最近注册人数
 	CountRegister(interface{}, string) (interface{}, error)
+
+	// IsPhoneExist 判断手机号是否存在
+	IsPhoneExist(string) bool
+
+	// IsEmailExist 判断邮箱是否已存在
+	IsEmailExist(string) bool
 }
