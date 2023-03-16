@@ -2,23 +2,23 @@ package middlewares
 
 import (
 	"bingo-example/pkg/helpers"
-	"bingo-example/pkg/logger"
 	"bytes"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
+	"github.com/xylong/bingo/log"
 	"go.uber.org/zap"
 	"io"
 	"time"
 )
 
-type log struct {
+type logger struct {
 }
 
-func newLog() *log {
-	return &log{}
+func newLog() *logger {
+	return &logger{}
 }
 
-func (l *log) Before(ctx *gin.Context) error {
+func (l *logger) Before(ctx *gin.Context) error {
 	// 获取 response 内容
 	w := &responseBodyWriter{
 		body:           &bytes.Buffer{},
@@ -63,18 +63,18 @@ func (l *log) Before(ctx *gin.Context) error {
 
 	if responseStatus > 400 && responseStatus <= 499 {
 		// 除了 StatusBadRequest 以外，warning 提示一下，常见的有 403 404，开发时都要注意
-		logger.Warn("HTTP Warning "+cast.ToString(responseStatus), logFields...)
+		log.Warn("HTTP Warning "+cast.ToString(responseStatus), logFields...)
 	} else if responseStatus >= 500 && responseStatus <= 599 {
 		// 除了内部错误，记录 error
-		logger.Error("HTTP Error "+cast.ToString(responseStatus), logFields...)
+		log.Error("HTTP Error "+cast.ToString(responseStatus), logFields...)
 	} else {
-		logger.Debug("HTTP Access Log", logFields...)
+		log.Debug("HTTP Access Log", logFields...)
 	}
 
 	return nil
 }
 
-func (l *log) After(data interface{}) (interface{}, error) {
+func (l *logger) After(data interface{}) (interface{}, error) {
 	return data, nil
 }
 

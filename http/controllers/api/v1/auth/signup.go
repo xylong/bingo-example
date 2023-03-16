@@ -8,6 +8,7 @@ import (
 	"bingo-example/requests"
 	"github.com/gin-gonic/gin"
 	"github.com/xylong/bingo"
+	"github.com/xylong/bingo/log"
 )
 
 func init() {
@@ -32,6 +33,8 @@ func (c *SignupController) IsPhoneExist(ctx *gin.Context) interface{} {
 	if result := requests.Validate(ctx, &request, requests.SignupPhoneExist); result != nil {
 		return result
 	}
+
+	log.Dump(request)
 
 	return response.Data(dao.NewUserRepo(database.DB()).IsPhoneExist(request.Phone))
 }

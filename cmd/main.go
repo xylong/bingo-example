@@ -5,7 +5,7 @@ import (
 	"bingo-example/bootstrap/routes"
 	_ "bingo-example/config"
 	_ "bingo-example/docs"
-	"bingo-example/http/controllers/api/v1"
+	v1 "bingo-example/http/controllers/api/v1"
 	_ "bingo-example/http/controllers/api/v1/auth"
 	"bingo-example/http/middlewares"
 	"bingo-example/lib/core"
@@ -32,15 +32,14 @@ import (
 // @securityDefinitions.basic  BasicAuth
 func main() {
 	var env string
+
 	flag.StringVar(&env, "env", "", "加载 .env 文件，如 --env=testing 加载的是 .env.testing 文件")
 	flag.Parse()
 	config.InitConfig(env)
 
-	bootstrap.SetupLogger()
-
-	bingo.Init("conf", "app").
+	bingo.Init().
 		Inject(bootstrap.NewClient(), core.NewService()).
 		Route("swagger", routes.Swagger).
 		Mount("v1", v1.Controller...)(middlewares.Cors, middlewares.Log).
-		Lunch()
+		Lunch(8080)
 }
