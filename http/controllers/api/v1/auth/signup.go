@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/xylong/bingo"
 	"github.com/xylong/bingo/log"
+	"go.uber.org/zap"
 )
 
 func init() {
@@ -35,6 +36,7 @@ func (c *SignupController) IsPhoneExist(ctx *gin.Context) interface{} {
 	}
 
 	log.Dump(request)
+	zap.L().Info("hello world")
 
 	return response.Data(dao.NewUserRepo(database.DB()).IsPhoneExist(request.Phone))
 }
