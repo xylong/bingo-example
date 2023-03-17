@@ -137,11 +137,11 @@ func (rds RedisClient) Decrement(parameters ...interface{}) bool {
 
 var (
 	once  sync.Once
-	Cache *RedisClient
+	Redis *RedisClient
 )
 
 func Connect(options *redis.Options) {
 	once.Do(func() {
-		Cache = NewRedisClient(options)
+		Redis = NewRedisClient(options)
 	})
 }
