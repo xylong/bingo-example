@@ -5,7 +5,6 @@ import (
 	"bingo-example/pkg/database"
 	"bingo-example/pkg/es"
 	"github.com/olivere/elastic/v7"
-	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 )
@@ -25,9 +24,9 @@ func (c *Client) Mysql() *gorm.DB {
 }
 
 // Redis redis客户端
-func (c *Client) Redis() *redis.Client {
+func (c *Client) Redis() *cache.RedisClient {
 	SetupRedis()
-	return cache.Redis()
+	return cache.Redis
 }
 
 // Elastic elastic客户端
