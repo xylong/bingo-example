@@ -53,9 +53,28 @@ func (c *VerifyCodeController) SendUsingPhone(ctx *gin.Context) interface{} {
 	return true
 }
 
+// SendUsingEmail 发送 Email 验证码
+func (c *VerifyCodeController) SendUsingEmail(ctx *gin.Context) interface{} {
+
+	// 1. 验证表单
+	request := requests.VerifyCodeEmailRequest{}
+	if result := requests.Validate(ctx, &request, requests.VerifyCodeEmail); result != nil {
+		return result
+	}
+
+	// 2. 发送邮件
+	err := verifycode.NewVerifyCode().SendEmail(request.Email)
+	if err != nil {
+		response.Abort500(ctx, "发送 Email 验证码失败~")
+	}
+
+	return true
+}
+
 func (c *VerifyCodeController) Route(group *bingo.Group) {
 	group.Group("auth", func(group *bingo.Group) {
 		group.POST("verify-codes/captcha", c.showCaptcha)
 		group.POST("verify-codes/phone", c.SendUsingPhone)
+		group.POST("verify-codes/email", c.SendUsingEmail)
 	})
 }
