@@ -4,7 +4,6 @@ import (
 	"bingo-example/pkg/helpers"
 	"context"
 	"github.com/pkg/errors"
-	"github.com/xylong/bingo/log"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -22,7 +21,7 @@ type GormLogger struct {
 
 func NewGormLogger() *GormLogger {
 	return &GormLogger{
-		ZapLogger:     log.Logger,
+		ZapLogger:     Logger,
 		SlowThreshold: 200 * time.Millisecond,
 	}
 }

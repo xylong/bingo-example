@@ -37,7 +37,9 @@ func main() {
 	flag.Parse()
 	config.InitConfig(env)
 
-	bingo.Init(bootstrap.SetupLogger()).
+	bootstrap.SetupLogger()
+
+	bingo.Init().
 		Inject(bootstrap.NewClient(), core.NewService()).
 		Route("swagger", routes.Swagger).
 		Mount("v1", v1.Controller...)(middlewares.Cors, middlewares.Log).

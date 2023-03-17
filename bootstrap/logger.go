@@ -1,8 +1,18 @@
 package bootstrap
 
-import "bingo-example/pkg/logger"
+import (
+	"bingo-example/pkg/config"
+	"bingo-example/pkg/logger"
+)
 
 // SetupLogger 初始化 Logger
-func SetupLogger() *logger.LogConfig {
-	return &logger.LogConfig{}
+func SetupLogger() {
+	logger.InitLogger(
+		config.GetString("log.filename"),
+		config.GetInt("log.max_size"),
+		config.GetInt("log.max_backup"),
+		config.GetInt("log.max_age"),
+		config.GetBool("log.compress"),
+		config.GetString("log.type"),
+		config.GetString("log.level"))
 }

@@ -2,14 +2,12 @@ package auth
 
 import (
 	v1 "bingo-example/http/controllers/api/v1"
+	requests2 "bingo-example/http/requests"
 	"bingo-example/infrastructure/dao"
 	"bingo-example/pkg/database"
 	"bingo-example/pkg/response"
-	"bingo-example/requests"
 	"github.com/gin-gonic/gin"
 	"github.com/xylong/bingo"
-	"github.com/xylong/bingo/log"
-	"go.uber.org/zap"
 )
 
 func init() {
@@ -30,20 +28,17 @@ func (c *SignupController) Name() string {
 }
 
 func (c *SignupController) IsPhoneExist(ctx *gin.Context) interface{} {
-	request := requests.SignupPhoneExistRequest{}
-	if result := requests.Validate(ctx, &request, requests.SignupPhoneExist); result != nil {
+	request := requests2.SignupPhoneExistRequest{}
+	if result := requests2.Validate(ctx, &request, requests2.SignupPhoneExist); result != nil {
 		return result
 	}
-
-	log.Dump(request)
-	zap.L().Info("hello world")
 
 	return response.Data(dao.NewUserRepo(database.DB()).IsPhoneExist(request.Phone))
 }
 
 func (c *SignupController) IsEmailExist(ctx *gin.Context) interface{} {
-	request := requests.SignupEmailExistRequest{}
-	if result := requests.Validate(ctx, &request, requests.SignupEmailExist); result != nil {
+	request := requests2.SignupEmailExistRequest{}
+	if result := requests2.Validate(ctx, &request, requests2.SignupEmailExist); result != nil {
 		return result
 	}
 
