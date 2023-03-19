@@ -9,7 +9,7 @@ out/
 __debug_bin
 .project
 
-conf/app.yaml
+config/app.yaml
 logs
 
 tmp
