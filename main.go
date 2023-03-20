@@ -52,7 +52,11 @@ func main() {
 	}
 
 	// 注册子命令
-	rootCmd.AddCommand(cmd.CmdServe)
+	rootCmd.AddCommand(
+		cmd.CmdServe,
+		cmd.CmdKey,
+	)
+
 	// 配置默认运行 Web 服务
 	cmd.RegisterDefaultCmd(rootCmd, cmd.CmdServe)
 
