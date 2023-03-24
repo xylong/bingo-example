@@ -3,6 +3,7 @@ package main
 import (
 	"bingo-example/bootstrap"
 	"bingo-example/cmd"
+	make2 "bingo-example/cmd/make"
 	_ "bingo-example/config"
 	_ "bingo-example/docs"
 	_ "bingo-example/http/controllers/api/v1/auth"
@@ -56,6 +57,7 @@ func main() {
 		cmd.CmdServe,
 		cmd.CmdKey,
 		cmd.CmdPlay,
+		make2.CmdMake,
 	)
 
 	// 配置默认运行 Web 服务
