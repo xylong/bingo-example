@@ -4,10 +4,10 @@ import "os"
 
 // Put 将数据存入文件
 func Put(data []byte, to string) error {
-	err := os.WriteFile(to, data, 0644)
-	if err != nil {
+	if err := os.WriteFile(to, data, 0644); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -16,5 +16,6 @@ func Exists(fileToCheck string) bool {
 	if _, err := os.Stat(fileToCheck); os.IsNotExist(err) {
 		return false
 	}
+
 	return true
 }

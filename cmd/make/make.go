@@ -2,6 +2,7 @@ package make
 
 import (
 	"bingo-example/pkg/console"
+	"bingo-example/pkg/file"
 	"bingo-example/pkg/str"
 	"embed"
 	"fmt"

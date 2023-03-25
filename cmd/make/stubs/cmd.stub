@@ -2,8 +2,7 @@ package cmd
 
 import (
     "errors"
-    "gohub/pkg/console"
-
+    "bingo-example/pkg/console"
     "github.com/spf13/cobra"
 )
 
@@ -16,7 +15,7 @@ var Cmd{{StructName}} = &cobra.Command{
 
 func run{{StructName}}(cmd *cobra.Command, args []string) {
 
-    console.Success("这是一条成功的提示")
+    console.Success("这是一条成功的提示!")
     console.Warning("这是一条提示")
     console.Error("这是一条错误信息")
     console.Warning("终端输出最好使用英文，这样兼容性会更好~")
