@@ -1,0 +1,28 @@
+//Package {{PackageName}} 模型
+package {{PackageName}}
+
+import (
+    "bingo-example/pkg/database"
+)
+
+type {{StructName}} struct {
+
+    // Put fields in here
+    FIXME()
+
+    models.CommonTimestampsField
+}
+
+func ({{VariableName}} *{{StructName}}) Create() {
+    database.DB().Create(&{{VariableName}})
+}
+
+func ({{VariableName}} *{{StructName}}) Save() (rowsAffected int64) {
+    result := database.DB().Save(&{{VariableName}})
+    return result.RowsAffected
+}
+
+func ({{VariableName}} *{{StructName}}) Delete() (rowsAffected int64) {
+    result := database.DB().Delete(&{{VariableName}})
+    return result.RowsAffected
+}
