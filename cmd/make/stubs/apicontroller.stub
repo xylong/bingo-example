@@ -1,0 +1,20 @@
+package v1
+
+import (
+    "github.com/gin-gonic/gin"
+    "github.com/xylong/bingo"
+)
+
+type {{StructNamePlural}}Controller struct {
+    *BaseApiController
+}
+
+func (ctrl *{{StructNamePlural}}Controller) Name(ctx *gin.Context) string {
+    return "{{StructNamePlural}}"
+}
+
+func (ctrl *{{StructNamePlural}}Controller) Route(group *bingo.Group) {
+
+}
+
+
