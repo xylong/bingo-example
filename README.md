@@ -72,3 +72,6 @@ bingo脚手架使用demo
 ### 命令
 - swag init -g cmd/main.go
 - swag init --parseDependency --parseInternal -g cmd/main.go
+- go run main.go make apicontroller v1/project
+- go run main.go make model project
+- go run main.go make cmd testCommand
