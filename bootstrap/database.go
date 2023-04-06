@@ -1,7 +1,9 @@
 package bootstrap
 
 import (
+	"bingo-example/domain/entity/profile"
 	"bingo-example/domain/entity/user"
+	"bingo-example/domain/entity/userlog"
 	"bingo-example/pkg/config"
 	"bingo-example/pkg/database"
 	logger2 "bingo-example/pkg/logger"
@@ -54,5 +56,5 @@ func SetupDB() {
 }
 
 func migrate() {
-	database.DB().AutoMigrate(&user.User{})
+	database.DB().AutoMigrate(&user.User{}, &profile.Profile{}, &userlog.UserLog{})
 }

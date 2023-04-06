@@ -10,6 +10,7 @@ bingo脚手架使用demo
 - [mongo](https://go.mongodb.org/mongo-driver) mongodb
 - [swagger](https://github.com/swaggo/gin-swagger) 文档
 - [govalidator](https://github.com/thedevsaddam/govalidator) 验证器
+- [amqp](https://github.com/streadway/amqp) rabbitmq
 
 ### 结构
 ```azure
