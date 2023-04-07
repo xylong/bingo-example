@@ -4,7 +4,9 @@ import (
 	"bingo-example/pkg/cache"
 	"bingo-example/pkg/database"
 	"bingo-example/pkg/es"
+	"bingo-example/pkg/mq"
 	"github.com/olivere/elastic/v7"
+	"github.com/streadway/amqp"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 )
@@ -39,4 +41,10 @@ func (c *Client) Elastic() *elastic.Client {
 func (c *Client) Mongo() *mongo.Client {
 	SetupMongo()
 	return database.Mongo()
+}
+
+// Rabbitmq rabbitmq
+func (c *Client) Rabbitmq() *amqp.Connection {
+	SetupRabbitmq()
+	return mq.Connection()
 }

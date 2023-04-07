@@ -2,20 +2,16 @@ package mq
 
 import "github.com/streadway/amqp"
 
-var channel *amqp.Channel
+var conn *amqp.Connection
 
 func Connect(dsn string) {
-	conn, err := amqp.Dial(dsn)
-	if err != nil {
-		panic(err)
-	}
-
-	channel, err = conn.Channel()
+	var err error
+	conn, err = amqp.Dial(dsn)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func Channel() *amqp.Channel {
-	return channel
+func Connection() *amqp.Connection {
+	return conn
 }
