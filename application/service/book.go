@@ -8,13 +8,13 @@ import (
 	"bingo-example/infrastructure/dao"
 	"context"
 	"fmt"
+	"strconv"
+
 	"github.com/graphql-go/graphql"
 	"github.com/olivere/elastic/v7"
 	"github.com/xylong/bingo/ioc"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"strconv"
-	"sync"
 )
 
 // BookService 📚
@@ -24,44 +24,6 @@ type BookService struct {
 
 	DB *gorm.DB        `inject:"-"`
 	Es *elastic.Client `inject:"-"`
-}
-
-// BatchImport 批量导入
-func (s *BookService) BatchImport(ctx context.Context) {
-	page, pageSize := 1, 1000
-	wg := sync.WaitGroup{}
-
-	for {
-		// 从mysql获取数据
-		books := book.Books{}
-		err := s.DB.Model(&book.Book{}).Order("id desc").Limit(pageSize).Offset((page - 1) * pageSize).Find(&books).Error
-		if err != nil || len(books) == 0 {
-			break
-		}
-
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-
-			// 导入到es
-			bulk := s.Es.Bulk()
-			for _, b := range books {
-				req := elastic.NewBulkIndexRequest()
-				req.Index(constants.BookIndex).Id(strconv.Itoa(b.ID)).Doc(b)
-				bulk.Add(req)
-			}
-
-			if rep, err := bulk.Do(ctx); err != nil {
-				zap.L().Error("import book failed", zap.Error(err))
-			} else {
-				zap.L().Info("import book succeed", zap.Any("books", rep))
-			}
-		}()
-
-		page++
-	}
-
-	wg.Wait()
 }
 
 // Search 搜索

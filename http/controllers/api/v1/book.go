@@ -3,6 +3,8 @@ package v1
 import (
 	"bingo-example/application/dto"
 	"bingo-example/application/service"
+	"bingo-example/pkg/response"
+
 	"github.com/gin-gonic/gin"
 	"github.com/graphql-go/handler"
 	"github.com/xylong/bingo"
@@ -20,10 +22,6 @@ func NewBookController() *BookController {
 	return &BookController{}
 }
 
-func (c *BookController) import2es(ctx *gin.Context) {
-	c.Service.BatchImport(ctx)
-}
-
 func (c *BookController) index(ctx *gin.Context) {
 	schema := c.Service.GraphSchema(ctx)
 
@@ -37,8 +35,12 @@ func (c *BookController) show(ctx *gin.Context) interface{} {
 }
 
 func (c *BookController) search(ctx *gin.Context) interface{} {
-	return nil
-	//return c.Service.Search(ctx, ctx.Binding(ctx.ShouldBind, &dto.BookSearchParam{}).Unwrap().(*dto.BookSearchParam))
+	param := &dto.BookSearchParam{}
+	if err := ctx.ShouldBind(param); err != nil {
+		return response.Error(ctx, err)
+	}
+
+	return c.Service.Search(ctx, param)
 }
 
 func (c *BookController) press(ctx *gin.Context) interface{} {
@@ -81,7 +83,6 @@ func (c *BookController) Name() string {
 }
 
 func (c *BookController) Route(group *bingo.Group) {
-	group.GET("import", c.import2es)
 	group.GET("books", c.search)
 	group.GET("books/:id", c.show)
 	group.GET("presses", c.press)

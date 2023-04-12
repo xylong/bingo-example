@@ -7,6 +7,7 @@ import (
 	"bingo-example/http/middlewares"
 	"bingo-example/lib/core"
 	"bingo-example/pkg/config"
+
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 	"github.com/xylong/bingo"

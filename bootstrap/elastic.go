@@ -4,6 +4,7 @@ import (
 	"bingo-example/pkg/config"
 	"bingo-example/pkg/es"
 	"fmt"
+
 	"github.com/olivere/elastic/v7"
 )
 

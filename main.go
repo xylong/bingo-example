@@ -10,8 +10,9 @@ import (
 	"bingo-example/pkg/config"
 	"bingo-example/pkg/console"
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
+
+	"github.com/spf13/cobra"
 )
 
 // @title           Bingo Example API
@@ -58,6 +59,7 @@ func main() {
 		cmd.CmdKey,
 		cmd.CmdPlay,
 		make.CmdMake,
+		cmd.CmdImportBook,
 	)
 
 	// 配置默认运行 Web 服务
